@@ -4,9 +4,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, Users, DollarSign, TrendingUp, Plus } from "lucide-react";
 import { useState } from "react";
+import NewAppointmentModal from "@/components/NewAppointmentModal";
 
 const Dashboard = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [isNewAppointmentModalOpen, setIsNewAppointmentModalOpen] = useState(false);
+  const [prefilledAppointmentData, setPrefilledAppointmentData] = useState<{
+    date: Date;
+    time: string;
+    professionalId: number;
+  } | undefined>();
   
   // Dados mockados para demonstração
   const todayStats = {
@@ -38,6 +45,20 @@ const Dashboard = () => {
     return mockAppointments.find(apt => apt.time === time && apt.professional === professionalId);
   };
 
+  const handleNewAppointmentClick = (time: string, professionalId: number) => {
+    setPrefilledAppointmentData({
+      date: selectedDate,
+      time,
+      professionalId
+    });
+    setIsNewAppointmentModalOpen(true);
+  };
+
+  const handleNewAppointmentFromButton = () => {
+    setPrefilledAppointmentData(undefined);
+    setIsNewAppointmentModalOpen(true);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -53,7 +74,7 @@ const Dashboard = () => {
             })}
           </p>
         </div>
-        <Button className="gradient-bg hover:opacity-90">
+        <Button className="gradient-bg hover:opacity-90" onClick={handleNewAppointmentFromButton}>
           <Plus className="h-4 w-4 mr-2" />
           Novo Agendamento
         </Button>
@@ -159,7 +180,10 @@ const Dashboard = () => {
                             </Badge>
                           </div>
                         ) : (
-                          <div className="h-full flex items-center justify-center text-muted-foreground hover:bg-muted/50 rounded-lg cursor-pointer transition-colors">
+                          <div 
+                            className="h-full flex items-center justify-center text-muted-foreground hover:bg-muted/50 rounded-lg cursor-pointer transition-colors"
+                            onClick={() => handleNewAppointmentClick(time, prof.id)}
+                          >
                             <Plus className="h-4 w-4" />
                           </div>
                         )}
@@ -172,6 +196,13 @@ const Dashboard = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Modal de Novo Agendamento */}
+      <NewAppointmentModal
+        isOpen={isNewAppointmentModalOpen}
+        onClose={() => setIsNewAppointmentModalOpen(false)}
+        prefilledData={prefilledAppointmentData}
+      />
     </div>
   );
 };
