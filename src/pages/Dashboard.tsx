@@ -6,6 +6,9 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Calendar, Clock, Users, DollarSign, TrendingUp, Plus, X, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import NewAppointmentModal from "@/components/NewAppointmentModal";
+import DateNavigation from "@/components/DateNavigation";
+import AppointmentTooltip from "@/components/AppointmentTooltip";
+import CurrentTimeIndicator from "@/components/CurrentTimeIndicator";
 import { useAppointments, useDeleteAppointment, useTodayStats } from "@/hooks/useAppointments";
 import { useProfessionals } from "@/hooks/useProfessionals";
 import { useToast } from "@/hooks/use-toast";
@@ -138,16 +141,14 @@ const Dashboard = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground">
-            {selectedDate.toLocaleDateString('pt-BR', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          })}
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-2">
+            <DateNavigation 
+              selectedDate={selectedDate} 
+              onDateChange={setSelectedDate} 
+            />
+          </div>
         </div>
-        <Button className="gradient-bg hover:opacity-90" onClick={handleNewAppointmentFromButton}>
+        <Button className="gradient-bg hover:opacity-90 hover-scale" onClick={handleNewAppointmentFromButton}>
           <Plus className="h-4 w-4 mr-2" />
           Novo Agendamento
         </Button>
@@ -254,13 +255,16 @@ const Dashboard = () => {
                     {/* Colunas dos Profissionais */}
                     {professionals.map(prof => {
                 const professionalAppointments = getAppointmentsForProfessional(prof.id);
-                return <div key={`${hour}-${prof.id}`} className="relative border-r border-b hover:bg-muted/30 cursor-pointer transition-colors" style={{
+                return <div key={`${hour}-${prof.id}`} className="relative border-r border-b hover:bg-muted/30 cursor-pointer transition-all duration-200 hover:shadow-inner" style={{
                   height: '60px'
                 }} onClick={e => handleTimelineClick(e, prof.id)}>
                           {/* Linhas de guia de 15 em 15 min */}
                           <div className="absolute top-[15px] left-0 right-0 h-px bg-border/30"></div>
                           <div className="absolute top-[30px] left-0 right-0 h-px bg-border/50"></div>
                           <div className="absolute top-[45px] left-0 right-0 h-px bg-border/30"></div>
+                          
+                          {/* Indicador de horário atual */}
+                          {hour === 8 && <CurrentTimeIndicator selectedDate={selectedDate} />}
                           
                           {/* Renderizar agendamentos que ocupam este slot de hora */}
                           {professionalAppointments.map(appointment => {
@@ -280,14 +284,15 @@ const Dashboard = () => {
                     const endMinuteInHour = appointmentEnd <= currentHourEnd ? appointmentEnd.getMinutes() : 60;
                     const topPosition = startMinuteInHour;
                     const height = endMinuteInHour - startMinuteInHour;
-                    return <div key={appointment.id} className={`absolute left-1 right-1 rounded-md shadow-sm border z-20 group ${appointment.status === 'agendado' || appointment.status === 'confirmado' ? 'bg-primary text-primary-foreground border-primary/30' : 'bg-yellow-500 text-white border-yellow-400'}`} style={{
-                      top: `${topPosition}px`,
-                      height: `${Math.max(height, 20)}px`
-                    }} onClick={e => e.stopPropagation()}>
-                                <button className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center hover:bg-destructive/80 transition-colors shadow-sm z-30" onClick={e => {
-                        e.stopPropagation();
-                        handleDeleteAppointment(appointment.id, format(appointmentStart, 'HH:mm'), prof.id);
-                      }}>
+                    return <AppointmentTooltip key={appointment.id} appointment={appointment}>
+                              <div className={`absolute left-1 right-1 rounded-md shadow-sm border z-20 group hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer ${appointment.status === 'agendado' || appointment.status === 'confirmado' ? 'bg-primary text-primary-foreground border-primary/30 hover:bg-primary/90' : 'bg-yellow-500 text-white border-yellow-400 hover:bg-yellow-400'}`} style={{
+                                top: `${topPosition}px`,
+                                height: `${Math.max(height, 20)}px`
+                              }} onClick={e => e.stopPropagation()}>
+                                <button className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center hover:bg-destructive/80 hover:scale-110 transition-all duration-200 shadow-sm z-30" onClick={e => {
+                                  e.stopPropagation();
+                                  handleDeleteAppointment(appointment.id, format(appointmentStart, 'HH:mm'), prof.id);
+                                }}>
                                   <X className="h-2.5 w-2.5" />
                                 </button>
                                 <div className="p-1.5 h-full flex flex-col justify-center">
@@ -303,7 +308,8 @@ const Dashboard = () => {
                                       </Badge>
                                     </div>}
                                 </div>
-                              </div>;
+                              </div>
+                            </AppointmentTooltip>;
                   })}
                           
                           {/* Área clicável invisível para novos agendamentos */}
