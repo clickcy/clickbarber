@@ -1,9 +1,10 @@
 
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Users, DollarSign, TrendingUp, Plus } from "lucide-react";
-import { useState } from "react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Calendar, Clock, Users, DollarSign, TrendingUp, Plus, X } from "lucide-react";
 import NewAppointmentModal from "@/components/NewAppointmentModal";
 
 const Dashboard = () => {
@@ -14,6 +15,11 @@ const Dashboard = () => {
     time: string;
     professionalId: number;
   } | undefined>();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [appointmentToDelete, setAppointmentToDelete] = useState<{
+    time: string;
+    professionalId: number;
+  } | null>(null);
   
   // Dados mockados para demonstração
   const todayStats = {
@@ -57,6 +63,24 @@ const Dashboard = () => {
   const handleNewAppointmentFromButton = () => {
     setPrefilledAppointmentData(undefined);
     setIsNewAppointmentModalOpen(true);
+  };
+
+  const handleDeleteAppointment = (time: string, professionalId: number) => {
+    setAppointmentToDelete({ time, professionalId });
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteAppointment = () => {
+    if (appointmentToDelete) {
+      // Aqui faria a chamada para o Supabase para deletar o agendamento
+      console.log("Deletando agendamento:", appointmentToDelete);
+      
+      // Por enquanto, vamos apenas simular a remoção localmente
+      // Em produção, seria necessário atualizar o estado dos agendamentos
+      
+      setDeleteDialogOpen(false);
+      setAppointmentToDelete(null);
+    }
   };
 
   return (
@@ -156,8 +180,8 @@ const Dashboard = () => {
 
               {/* Time Slots */}
               {timeSlots.map(time => (
-                <>
-                  <div key={time} className="p-3 text-center font-medium text-muted-foreground border-r">
+                <React.Fragment key={time}>
+                  <div className="p-3 text-center font-medium text-muted-foreground border-r">
                     {time}
                   </div>
                   {professionals.map(prof => {
@@ -165,11 +189,17 @@ const Dashboard = () => {
                     return (
                       <div key={`${time}-${prof.id}`} className="p-2 min-h-[60px] border-r border-b">
                         {appointment ? (
-                          <div className={`p-2 rounded-lg text-xs ${
+                          <div className={`relative p-2 rounded-lg text-xs ${
                             appointment.status === 'confirmed' 
                               ? 'bg-primary/10 border border-primary/20' 
                               : 'bg-yellow-50 border border-yellow-200'
                           }`}>
+                            <button
+                              className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center hover:bg-destructive/80 transition-colors"
+                              onClick={() => handleDeleteAppointment(time, prof.id)}
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
                             <div className="font-medium text-foreground">{appointment.client}</div>
                             <div className="text-muted-foreground">{appointment.service}</div>
                             <Badge 
@@ -190,7 +220,7 @@ const Dashboard = () => {
                       </div>
                     );
                   })}
-                </>
+                </React.Fragment>
               ))}
             </div>
           </div>
@@ -203,6 +233,24 @@ const Dashboard = () => {
         onClose={() => setIsNewAppointmentModalOpen(false)}
         prefilledData={prefilledAppointmentData}
       />
+
+      {/* Dialog de Confirmação de Exclusão */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja cancelar este agendamento? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteAppointment} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Confirmar Exclusão
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
