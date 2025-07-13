@@ -12,7 +12,7 @@ import { format, addMinutes } from "date-fns";
 import { useProfessionals } from "@/hooks/useProfessionals";
 import { useServices } from "@/hooks/useServices";
 import { useClients, useCreateClient } from "@/hooks/useClients";
-import { useCreateAppointment } from "@/hooks/useAppointments";
+import { useCreateAppointment, useAppointments } from "@/hooks/useAppointments";
 import { useToast } from "@/hooks/use-toast";
 
 interface Service {
@@ -66,6 +66,10 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData }: NewAppointmentM
   const { data: clients = [], isLoading: clientsLoading } = useClients(clientSearch);
   const createAppointmentMutation = useCreateAppointment();
   const createClientMutation = useCreateClient();
+  
+  // Buscar agendamentos existentes para verificar conflitos
+  const appointmentDate = date ? new Date(date) : new Date();
+  const { data: existingAppointments = [] } = useAppointments(appointmentDate);
 
   // Calcular duração total dos serviços
   const totalDuration = selectedServices.reduce((total, service) => total + service.duration_minutes, 0);
@@ -106,6 +110,19 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData }: NewAppointmentM
     setSelectedServices(selectedServices.filter(s => s.id !== serviceId));
   };
 
+  // Função para verificar conflitos de horário
+  const checkTimeConflict = (startTime: Date, endTime: Date, professionalId: string) => {
+    return existingAppointments.some(appointment => {
+      if (appointment.professional.id !== professionalId) return false;
+      
+      const existingStart = new Date(appointment.start_time);
+      const existingEnd = new Date(appointment.end_time);
+      
+      // Verificar sobreposição: (novo_inicio < existente_fim) E (novo_fim > existente_inicio)
+      return startTime < existingEnd && endTime > existingStart;
+    });
+  };
+
   const handleSubmit = async () => {
     // Validação básica
     if (!selectedClient || !selectedProfessional || selectedServices.length === 0 || !date || !time) {
@@ -117,10 +134,31 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData }: NewAppointmentM
       return;
     }
 
-    try {
-      const startDateTime = new Date(`${date}T${time}`);
-      const endDateTime = addMinutes(startDateTime, totalDuration);
+    const startDateTime = new Date(`${date}T${time}`);
+    const endDateTime = addMinutes(startDateTime, totalDuration);
 
+    // Verificar conflitos de horário
+    if (checkTimeConflict(startDateTime, endDateTime, selectedProfessional)) {
+      const conflictingAppointment = existingAppointments.find(appointment => {
+        if (appointment.professional.id !== selectedProfessional) return false;
+        const existingStart = new Date(appointment.start_time);
+        const existingEnd = new Date(appointment.end_time);
+        return startDateTime < existingEnd && endDateTime > existingStart;
+      });
+
+      const conflictTimeRange = conflictingAppointment 
+        ? `${format(new Date(conflictingAppointment.start_time), 'HH:mm')} às ${format(new Date(conflictingAppointment.end_time), 'HH:mm')}`
+        : '';
+
+      toast({
+        title: "Conflito de horário",
+        description: `Já existe um agendamento para este profissional no horário ${conflictTimeRange}. Escolha outro horário.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
       await createAppointmentMutation.mutateAsync({
         client_id: selectedClient,
         professional_id: selectedProfessional,

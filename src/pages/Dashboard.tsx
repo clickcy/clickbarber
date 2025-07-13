@@ -34,22 +34,63 @@ const Dashboard = () => {
   const { data: professionals = [], isLoading: professionalsLoading } = useProfessionals();
   const deleteAppointmentMutation = useDeleteAppointment();
 
+  // Gerar horários de 8h às 18h
   const timeSlots = Array.from({ length: 11 }, (_, i) => {
     const hour = 8 + i;
-    return `${hour.toString().padStart(2, '0')}:00`;
+    return hour;
   });
 
-  const getAppointmentForSlot = (time: string, professionalId: string) => {
-    return appointments.find(apt => {
-      const appointmentTime = format(new Date(apt.start_time), 'HH:mm');
-      return appointmentTime === time && apt.professional.id === professionalId;
-    });
+  // Função para calcular posição e altura dos agendamentos
+  const getAppointmentPosition = (startTime: string, endTime: string) => {
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+    
+    const startHour = start.getHours();
+    const startMinutes = start.getMinutes();
+    const endHour = end.getHours();
+    const endMinutes = end.getMinutes();
+    
+    // Posição inicial em minutos desde 8h
+    const topMinutes = (startHour - 8) * 60 + startMinutes;
+    // Duração em minutos
+    const durationMinutes = (endHour - startHour) * 60 + (endMinutes - startMinutes);
+    
+    return {
+      top: topMinutes, // minutos desde 8h
+      height: durationMinutes // duração em minutos
+    };
   };
 
-  const handleNewAppointmentClick = (time: string, professionalId: string) => {
+  // Filtrar agendamentos por profissional
+  const getAppointmentsForProfessional = (professionalId: string) => {
+    return appointments.filter(apt => apt.professional.id === professionalId);
+  };
+
+  // Função para capturar clique e calcular horário exato
+  const handleTimelineClick = (event: React.MouseEvent, professionalId: string) => {
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    const clickY = event.clientY - rect.top;
+    
+    // Cada hora tem 60px de altura (definido no CSS)
+    const minutesFromStart = Math.floor(clickY / 1); // 1px = 1 minuto
+    const totalMinutes = minutesFromStart;
+    
+    const hour = Math.floor(totalMinutes / 60) + 8; // Começamos das 8h
+    const minutes = totalMinutes % 60;
+    
+    // Arredondar para intervalos de 15 minutos
+    const roundedMinutes = Math.round(minutes / 15) * 15;
+    const finalHour = roundedMinutes === 60 ? hour + 1 : hour;
+    const finalMinutes = roundedMinutes === 60 ? 0 : roundedMinutes;
+    
+    // Validar horário de funcionamento (8h-18h)
+    if (finalHour < 8 || finalHour >= 18) return;
+    
+    const timeString = `${finalHour.toString().padStart(2, '0')}:${finalMinutes.toString().padStart(2, '0')}`;
+    
     setPrefilledAppointmentData({
       date: selectedDate,
-      time,
+      time: timeString,
       professionalId
     });
     setIsNewAppointmentModalOpen(true);
@@ -181,11 +222,11 @@ const Dashboard = () => {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <div className={`grid grid-cols-[100px_repeat(${professionals.length},1fr)] gap-2 min-w-[600px]`}>
+              <div className={`grid grid-cols-[100px_repeat(${professionals.length},1fr)] gap-0 min-w-[600px]`}>
                 {/* Header */}
-                <div className="p-3 font-medium text-center border-b">Horário</div>
+                <div className="p-3 font-medium text-center border-b bg-background sticky top-0 z-10">Horário</div>
                 {professionals.map(prof => (
-                  <div key={prof.id} className="p-3 text-center border-b">
+                  <div key={prof.id} className="p-3 text-center border-b border-l bg-background sticky top-0 z-10">
                     <div className="flex items-center justify-center gap-2">
                       <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
                         {prof.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
@@ -195,47 +236,109 @@ const Dashboard = () => {
                   </div>
                 ))}
 
-                {/* Time Slots */}
-                {timeSlots.map(time => (
-                  <React.Fragment key={time}>
-                    <div className="p-3 text-center font-medium text-muted-foreground border-r">
-                      {time}
+                {/* Timeline Container */}
+                {timeSlots.map(hour => (
+                  <React.Fragment key={hour}>
+                    {/* Hora Label */}
+                    <div className="relative border-r border-b bg-background">
+                      <div className="absolute top-0 left-3 -mt-2 text-sm font-medium text-muted-foreground bg-background px-1">
+                        {hour.toString().padStart(2, '0')}:00
+                      </div>
+                      {/* Marcações de 15 em 15 minutos */}
+                      <div className="h-[60px] relative">
+                        <div className="absolute top-[15px] right-0 w-2 h-px bg-border"></div>
+                        <div className="absolute top-[30px] right-0 w-4 h-px bg-border"></div>
+                        <div className="absolute top-[45px] right-0 w-2 h-px bg-border"></div>
+                      </div>
                     </div>
+                    
+                    {/* Colunas dos Profissionais */}
                     {professionals.map(prof => {
-                      const appointment = getAppointmentForSlot(time, prof.id);
+                      const professionalAppointments = getAppointmentsForProfessional(prof.id);
+                      
                       return (
-                        <div key={`${time}-${prof.id}`} className="p-2 min-h-[60px] border-r border-b">
-                          {appointment ? (
-                            <div className={`relative p-2 rounded-lg text-xs ${
-                              appointment.status === 'agendado' || appointment.status === 'confirmado'
-                                ? 'bg-primary/10 border border-primary/20' 
-                                : 'bg-yellow-50 border border-yellow-200'
-                            }`}>
-                              <button
-                                className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center hover:bg-destructive/80 transition-colors"
-                                onClick={() => handleDeleteAppointment(appointment.id, time, prof.id)}
+                        <div 
+                          key={`${hour}-${prof.id}`} 
+                          className="relative border-r border-b hover:bg-muted/30 cursor-pointer transition-colors"
+                          style={{ height: '60px' }}
+                          onClick={(e) => handleTimelineClick(e, prof.id)}
+                        >
+                          {/* Linhas de guia de 15 em 15 min */}
+                          <div className="absolute top-[15px] left-0 right-0 h-px bg-border/30"></div>
+                          <div className="absolute top-[30px] left-0 right-0 h-px bg-border/50"></div>
+                          <div className="absolute top-[45px] left-0 right-0 h-px bg-border/30"></div>
+                          
+                          {/* Renderizar agendamentos que ocupam este slot de hora */}
+                          {professionalAppointments.map(appointment => {
+                            const appointmentStart = new Date(appointment.start_time);
+                            const appointmentEnd = new Date(appointment.end_time);
+                            const currentHourStart = new Date(selectedDate);
+                            currentHourStart.setHours(hour, 0, 0, 0);
+                            const currentHourEnd = new Date(selectedDate);
+                            currentHourEnd.setHours(hour + 1, 0, 0, 0);
+                            
+                            // Verificar se o agendamento intercepta esta hora
+                            const hasIntersection = appointmentStart < currentHourEnd && appointmentEnd > currentHourStart;
+                            
+                            if (!hasIntersection) return null;
+                            
+                            // Calcular posição e altura relativas a esta hora
+                            const startMinuteInHour = appointmentStart >= currentHourStart 
+                              ? appointmentStart.getMinutes() 
+                              : 0;
+                            const endMinuteInHour = appointmentEnd <= currentHourEnd 
+                              ? appointmentEnd.getMinutes() 
+                              : 60;
+                            
+                            const topPosition = startMinuteInHour;
+                            const height = endMinuteInHour - startMinuteInHour;
+                            
+                            return (
+                              <div
+                                key={appointment.id}
+                                className={`absolute left-1 right-1 rounded text-xs overflow-hidden z-20 ${
+                                  appointment.status === 'agendado' || appointment.status === 'confirmado'
+                                    ? 'bg-primary/20 border border-primary/40 text-primary-foreground' 
+                                    : 'bg-yellow-100 border border-yellow-300 text-yellow-900'
+                                }`}
+                                style={{
+                                  top: `${topPosition}px`,
+                                  height: `${height}px`,
+                                  minHeight: '15px'
+                                }}
+                                onClick={(e) => e.stopPropagation()}
                               >
-                                <X className="h-3 w-3" />
-                              </button>
-                              <div className="font-medium text-foreground">{appointment.client.name}</div>
-                              <div className="text-muted-foreground">
-                                {appointment.services.map(s => s.name).join(', ')}
+                                <button
+                                  className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center hover:bg-destructive/80 transition-colors text-[10px] z-30"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteAppointment(appointment.id, format(appointmentStart, 'HH:mm'), prof.id);
+                                  }}
+                                >
+                                  <X className="h-2 w-2" />
+                                </button>
+                                <div className="p-1">
+                                  <div className="font-medium truncate" style={{ fontSize: '10px' }}>
+                                    {format(appointmentStart, 'HH:mm')} - {appointment.client.name}
+                                  </div>
+                                  <div className="text-[9px] opacity-90 truncate">
+                                    {appointment.services.map(s => s.name).join(', ')}
+                                  </div>
+                                  {height >= 25 && (
+                                    <Badge 
+                                      variant={appointment.status === 'confirmado' ? 'default' : 'secondary'}
+                                      className="mt-0.5 text-[8px] h-3"
+                                    >
+                                      {appointment.status === 'confirmado' ? 'Confirmado' : 'Agendado'}
+                                    </Badge>
+                                  )}
+                                </div>
                               </div>
-                              <Badge 
-                                variant={appointment.status === 'confirmado' ? 'default' : 'secondary'}
-                                className="mt-1 text-[10px]"
-                              >
-                                {appointment.status === 'confirmado' ? 'Confirmado' : 'Agendado'}
-                              </Badge>
-                            </div>
-                          ) : (
-                            <div 
-                              className="h-full flex items-center justify-center text-muted-foreground hover:bg-muted/50 rounded-lg cursor-pointer transition-colors"
-                              onClick={() => handleNewAppointmentClick(time, prof.id)}
-                            >
-                              <Plus className="h-4 w-4" />
-                            </div>
-                          )}
+                            );
+                          })}
+                          
+                          {/* Área clicável invisível para novos agendamentos */}
+                          <div className="absolute inset-0 z-10"></div>
                         </div>
                       );
                     })}
