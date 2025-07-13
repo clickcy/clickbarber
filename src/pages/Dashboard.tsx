@@ -296,41 +296,42 @@ const Dashboard = () => {
                             return (
                               <div
                                 key={appointment.id}
-                                className={`absolute left-1 right-1 rounded text-xs overflow-hidden z-20 ${
+                                className={`absolute left-1 right-1 rounded-md shadow-sm border z-20 group ${
                                   appointment.status === 'agendado' || appointment.status === 'confirmado'
-                                    ? 'bg-primary/20 border border-primary/40 text-primary-foreground' 
-                                    : 'bg-yellow-100 border border-yellow-300 text-yellow-900'
+                                    ? 'bg-primary text-primary-foreground border-primary/30' 
+                                    : 'bg-yellow-500 text-white border-yellow-400'
                                 }`}
                                 style={{
                                   top: `${topPosition}px`,
-                                  height: `${height}px`,
-                                  minHeight: '15px'
+                                  height: `${Math.max(height, 20)}px`
                                 }}
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <button
-                                  className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center hover:bg-destructive/80 transition-colors text-[10px] z-30"
+                                  className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center hover:bg-destructive/80 transition-colors shadow-sm z-30"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleDeleteAppointment(appointment.id, format(appointmentStart, 'HH:mm'), prof.id);
                                   }}
                                 >
-                                  <X className="h-2 w-2" />
+                                  <X className="h-2.5 w-2.5" />
                                 </button>
-                                <div className="p-1">
-                                  <div className="font-medium truncate" style={{ fontSize: '10px' }}>
+                                <div className="p-1.5 h-full flex flex-col justify-center">
+                                  <div className="font-semibold leading-tight text-xs truncate">
                                     {format(appointmentStart, 'HH:mm')} - {appointment.client.name}
                                   </div>
-                                  <div className="text-[9px] opacity-90 truncate">
+                                  <div className="text-[10px] opacity-90 leading-tight truncate mt-0.5">
                                     {appointment.services.map(s => s.name).join(', ')}
                                   </div>
-                                  {height >= 25 && (
-                                    <Badge 
-                                      variant={appointment.status === 'confirmado' ? 'default' : 'secondary'}
-                                      className="mt-0.5 text-[8px] h-3"
-                                    >
-                                      {appointment.status === 'confirmado' ? 'Confirmado' : 'Agendado'}
-                                    </Badge>
+                                  {height >= 35 && (
+                                    <div className="mt-1">
+                                      <Badge 
+                                        variant={appointment.status === 'confirmado' ? 'secondary' : 'outline'}
+                                        className="text-[8px] h-4 px-1 py-0 bg-white/20 text-white border-white/30"
+                                      >
+                                        {appointment.status === 'confirmado' ? 'Confirmado' : 'Agendado'}
+                                      </Badge>
+                                    </div>
                                   )}
                                 </div>
                               </div>
