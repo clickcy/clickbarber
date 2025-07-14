@@ -18,6 +18,13 @@ const Dashboard = () => {
     time: string;
     professionalId: number;
   } | undefined>();
+  const [editingAppointment, setEditingAppointment] = useState<{
+    time: string;
+    professional: number;
+    client: string;
+    service: string;
+    status: string;
+  } | undefined>();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [appointmentToDelete, setAppointmentToDelete] = useState<{
     time: string;
@@ -64,6 +71,19 @@ const Dashboard = () => {
   };
 
   const handleNewAppointmentFromButton = () => {
+    setPrefilledAppointmentData(undefined);
+    setEditingAppointment(undefined);
+    setIsNewAppointmentModalOpen(true);
+  };
+
+  const handleEditAppointment = (appointment: any) => {
+    setEditingAppointment({
+      time: appointment.time,
+      professional: appointment.professional,
+      client: appointment.client,
+      service: appointment.service,
+      status: appointment.status
+    });
     setPrefilledAppointmentData(undefined);
     setIsNewAppointmentModalOpen(true);
   };
@@ -189,11 +209,17 @@ const Dashboard = () => {
                       <div key={`${time}-${prof.id}`} className="p-2 min-h-[60px] border-r border-b time-slot">
                         {appointment ? (
                           <AppointmentTooltip appointment={appointment}>
-                            <div className={`appointment-block relative p-2 rounded-lg text-xs ${
-                              appointment.status === 'confirmed' 
-                                ? 'bg-primary/10 border border-primary/20' 
-                                : 'bg-yellow-50 border border-yellow-200'
-                            }`}>
+                            <div 
+                              className={`appointment-block relative p-2 rounded-lg text-xs cursor-pointer hover-scale ${
+                                appointment.status === 'confirmed' 
+                                  ? 'bg-primary/10 border border-primary/20' 
+                                  : 'bg-yellow-50 border border-yellow-200'
+                              }`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditAppointment(appointment);
+                              }}
+                            >
                               <button
                                 className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center hover:bg-destructive/80 transition-colors hover-scale z-10"
                                 onClick={() => handleDeleteAppointment(time, prof.id)}
@@ -232,8 +258,13 @@ const Dashboard = () => {
       {/* Modal de Novo Agendamento */}
       <NewAppointmentModal
         isOpen={isNewAppointmentModalOpen}
-        onClose={() => setIsNewAppointmentModalOpen(false)}
+        onClose={() => {
+          setIsNewAppointmentModalOpen(false);
+          setEditingAppointment(undefined);
+          setPrefilledAppointmentData(undefined);
+        }}
         prefilledData={prefilledAppointmentData}
+        editingAppointment={editingAppointment}
       />
 
       {/* Dialog de Confirmação de Exclusão */}

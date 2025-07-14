@@ -37,6 +37,13 @@ interface NewAppointmentModalProps {
     time: string;
     professionalId: number;
   };
+  editingAppointment?: {
+    time: string;
+    professional: number;
+    client: string;
+    service: string;
+    status: string;
+  };
 }
 
 // Mock data - em produção virá do Supabase
@@ -59,7 +66,7 @@ const mockClients: Client[] = [
   { id: 3, name: "José Santos", phone: "(11) 99999-3333", email: "jose@email.com" },
 ];
 
-const NewAppointmentModal = ({ isOpen, onClose, prefilledData }: NewAppointmentModalProps) => {
+const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointment }: NewAppointmentModalProps) => {
   const [selectedServices, setSelectedServices] = useState<Service[]>([]);
   const [selectedClient, setSelectedClient] = useState<string>("");
   const [selectedProfessional, setSelectedProfessional] = useState<string>("");
@@ -79,7 +86,21 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData }: NewAppointmentM
       setTime(prefilledData.time);
       setSelectedProfessional(prefilledData.professionalId.toString());
     }
-  }, [prefilledData, isOpen]);
+    
+    // Pré-preencher campos para edição
+    if (editingAppointment && isOpen) {
+      setTime(editingAppointment.time);
+      setSelectedProfessional(editingAppointment.professional.toString());
+      setClientSearch(editingAppointment.client);
+      setSelectedClient(mockClients.find(c => c.name === editingAppointment.client)?.id.toString() || "");
+      
+      // Encontrar serviço baseado no nome
+      const service = mockServices.find(s => s.name === editingAppointment.service);
+      if (service) {
+        setSelectedServices([service]);
+      }
+    }
+  }, [prefilledData, editingAppointment, isOpen]);
 
   // Resetar form ao fechar
   useEffect(() => {
@@ -137,7 +158,7 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData }: NewAppointmentM
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Agendar novo horário</DialogTitle>
+            <DialogTitle>{editingAppointment ? 'Editar Agendamento' : 'Agendar novo horário'}</DialogTitle>
           </DialogHeader>
 
           <div className="grid grid-cols-2 gap-4">
@@ -280,7 +301,7 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData }: NewAppointmentM
 
           {/* Botão Agendar */}
           <Button onClick={handleSubmit} className="w-full mt-4">
-            AGENDAR
+            {editingAppointment ? 'SALVAR ALTERAÇÕES' : 'AGENDAR'}
           </Button>
         </DialogContent>
       </Dialog>
