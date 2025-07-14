@@ -172,7 +172,25 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingAppointment ? 'Editar Agendamento' : 'Agendar novo horário'}</DialogTitle>
+            <div className="flex items-center justify-between">
+              <DialogTitle>{editingAppointment ? 'Editar Agendamento' : 'Agendar novo horário'}</DialogTitle>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="bg-green-500 hover:bg-green-600 text-white border-green-500"
+                >
+                  Comanda
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="bg-blue-500 hover:bg-blue-600 text-white border-blue-500"
+                >
+                  Produto
+                </Button>
+              </div>
+            </div>
           </DialogHeader>
 
           <div className="grid grid-cols-2 gap-4">
