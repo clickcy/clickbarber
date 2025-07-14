@@ -199,21 +199,41 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
             </div>
           </div>
 
-          {/* Profissional */}
-          <div className="space-y-2">
-            <Label>Profissional</Label>
-            <Select value={selectedProfessional} onValueChange={setSelectedProfessional}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione um profissional" />
-              </SelectTrigger>
-              <SelectContent>
-                {mockProfessionals.map(prof => (
-                  <SelectItem key={prof.id} value={prof.id.toString()}>
-                    {prof.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-2 gap-4">
+            {/* Profissional */}
+            <div className="space-y-2">
+              <Label>Profissional</Label>
+              <Select value={selectedProfessional} onValueChange={setSelectedProfessional}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione um profissional" />
+                </SelectTrigger>
+                <SelectContent>
+                  {mockProfessionals.map(prof => (
+                    <SelectItem key={prof.id} value={prof.id.toString()}>
+                      {prof.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Duração */}
+            <div className="space-y-2">
+              <Label htmlFor="duration">Duração (minutos)</Label>
+              <Input
+                id="duration"
+                type="number"
+                min="1"
+                value={totalDuration || ""}
+                onChange={(e) => setCustomDuration(parseInt(e.target.value) || 0)}
+                placeholder="Duração em minutos"
+              />
+              {totalServiceDuration > 0 && totalDuration !== totalServiceDuration && (
+                <p className="text-xs text-muted-foreground">
+                  Duração sugerida: {totalServiceDuration}min
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Serviços */}
@@ -253,23 +273,6 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
             )}
           </div>
 
-          {/* Duração */}
-          <div className="space-y-2">
-            <Label htmlFor="duration">Duração (minutos)</Label>
-            <Input
-              id="duration"
-              type="number"
-              min="1"
-              value={totalDuration || ""}
-              onChange={(e) => setCustomDuration(parseInt(e.target.value) || 0)}
-              placeholder="Duração em minutos"
-            />
-            {totalServiceDuration > 0 && totalDuration !== totalServiceDuration && (
-              <p className="text-xs text-muted-foreground">
-                Duração sugerida pelos serviços: {totalServiceDuration} minutos
-              </p>
-            )}
-          </div>
 
           {/* Cliente */}
           <div className="space-y-2">
