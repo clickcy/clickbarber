@@ -132,41 +132,6 @@ const Dashboard = () => {
         
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="hover-lift">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-            <CardTitle className="text-sm font-medium">Agendamentos Hoje</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent className="pb-2">
-            <div className="text-xl font-bold text-primary">{todayStats.appointments}</div>
-            
-          </CardContent>
-        </Card>
-
-        <Card className="hover-lift">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-            <CardTitle className="text-sm font-medium">Clientes Atendidos</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent className="pb-2">
-            <div className="text-xl font-bold text-primary">{todayStats.clients}</div>
-            
-          </CardContent>
-        </Card>
-
-        <Card className="hover-lift">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-            <CardTitle className="text-sm font-medium">Faturamento Hoje</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent className="pb-2">
-            <div className="text-xl font-bold text-primary">R$ {todayStats.revenue}</div>
-            
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Agenda Grid */}
       <Card>
