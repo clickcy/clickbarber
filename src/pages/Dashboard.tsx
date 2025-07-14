@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +8,6 @@ import NewAppointmentModal from "@/components/NewAppointmentModal";
 import { DateNavigation } from "@/components/DateNavigation";
 import { AppointmentTooltip } from "@/components/AppointmentTooltip";
 import { CurrentTimeIndicator } from "@/components/CurrentTimeIndicator";
-
 const Dashboard = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isNewAppointmentModalOpen, setIsNewAppointmentModalOpen] = useState(false);
@@ -30,7 +28,7 @@ const Dashboard = () => {
     time: string;
     professionalId: number;
   } | null>(null);
-  
+
   // Dados mockados para demonstração
   const todayStats = {
     appointments: 12,
@@ -38,29 +36,53 @@ const Dashboard = () => {
     revenue: 850,
     growth: 15
   };
-
-  const timeSlots = Array.from({ length: 11 }, (_, i) => {
+  const timeSlots = Array.from({
+    length: 11
+  }, (_, i) => {
     const hour = 8 + i;
     return `${hour.toString().padStart(2, '0')}:00`;
   });
-
-  const professionals = [
-    { id: 1, name: "João Silva", avatar: "JS" },
-    { id: 2, name: "Maria Santos", avatar: "MS" },
-    { id: 3, name: "Pedro Costa", avatar: "PC" }
-  ];
-
-  const mockAppointments = [
-    { time: "09:00", professional: 1, client: "Carlos Alberto", service: "Corte + Barba", status: "confirmed" },
-    { time: "10:30", professional: 2, client: "Roberto Silva", service: "Corte", status: "confirmed" },
-    { time: "14:00", professional: 1, client: "José Santos", service: "Barba", status: "pending" },
-    { time: "15:30", professional: 3, client: "André Lima", service: "Corte + Barba", status: "confirmed" },
-  ];
-
+  const professionals = [{
+    id: 1,
+    name: "João Silva",
+    avatar: "JS"
+  }, {
+    id: 2,
+    name: "Maria Santos",
+    avatar: "MS"
+  }, {
+    id: 3,
+    name: "Pedro Costa",
+    avatar: "PC"
+  }];
+  const mockAppointments = [{
+    time: "09:00",
+    professional: 1,
+    client: "Carlos Alberto",
+    service: "Corte + Barba",
+    status: "confirmed"
+  }, {
+    time: "10:30",
+    professional: 2,
+    client: "Roberto Silva",
+    service: "Corte",
+    status: "confirmed"
+  }, {
+    time: "14:00",
+    professional: 1,
+    client: "José Santos",
+    service: "Barba",
+    status: "pending"
+  }, {
+    time: "15:30",
+    professional: 3,
+    client: "André Lima",
+    service: "Corte + Barba",
+    status: "confirmed"
+  }];
   const getAppointmentForSlot = (time: string, professionalId: number) => {
     return mockAppointments.find(apt => apt.time === time && apt.professional === professionalId);
   };
-
   const handleNewAppointmentClick = (time: string, professionalId: number) => {
     setPrefilledAppointmentData({
       date: selectedDate,
@@ -69,13 +91,11 @@ const Dashboard = () => {
     });
     setIsNewAppointmentModalOpen(true);
   };
-
   const handleNewAppointmentFromButton = () => {
     setPrefilledAppointmentData(undefined);
     setEditingAppointment(undefined);
     setIsNewAppointmentModalOpen(true);
   };
-
   const handleEditAppointment = (appointment: any) => {
     setEditingAppointment({
       time: appointment.time,
@@ -87,30 +107,29 @@ const Dashboard = () => {
     setPrefilledAppointmentData(undefined);
     setIsNewAppointmentModalOpen(true);
   };
-
   const handleDeleteAppointment = (time: string, professionalId: number) => {
-    setAppointmentToDelete({ time, professionalId });
+    setAppointmentToDelete({
+      time,
+      professionalId
+    });
     setDeleteDialogOpen(true);
   };
-
   const confirmDeleteAppointment = () => {
     if (appointmentToDelete) {
       // Aqui faria a chamada para o Supabase para deletar o agendamento
       console.log("Deletando agendamento:", appointmentToDelete);
-      
+
       // Por enquanto, vamos apenas simular a remoção localmente
       // Em produção, seria necessário atualizar o estado dos agendamentos
-      
+
       setDeleteDialogOpen(false);
       setAppointmentToDelete(null);
     }
   };
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+        
       </div>
 
       {/* Stats Cards */}
@@ -160,17 +179,14 @@ const Dashboard = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div className="flex flex-col items-start">
                 <p className="text-sm text-muted-foreground mb-2">
-                  {selectedDate.toLocaleDateString('pt-BR', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
+                  {selectedDate.toLocaleDateString('pt-BR', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
                 </p>
-                <DateNavigation 
-                  selectedDate={selectedDate} 
-                  onDateChange={setSelectedDate}
-                />
+                <DateNavigation selectedDate={selectedDate} onDateChange={setSelectedDate} />
               </div>
               <Button className="gradient-bg hover:opacity-90" onClick={handleNewAppointmentFromButton}>
                 <Plus className="h-4 w-4 mr-2" />
@@ -186,69 +202,43 @@ const Dashboard = () => {
               <div className="grid grid-cols-[100px_repeat(3,1fr)] gap-2 min-w-[600px]">
               {/* Header */}
               <div className="p-3 font-medium text-center border-b">Horário</div>
-              {professionals.map(prof => (
-                <div key={prof.id} className="p-3 text-center border-b">
+              {professionals.map(prof => <div key={prof.id} className="p-3 text-center border-b">
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
                       {prof.avatar}
                     </div>
                     <span className="font-medium">{prof.name}</span>
                   </div>
-                </div>
-              ))}
+                </div>)}
 
               {/* Time Slots */}
-              {timeSlots.map(time => (
-                <React.Fragment key={time}>
+              {timeSlots.map(time => <React.Fragment key={time}>
                   <div className="p-3 text-center font-medium text-muted-foreground border-r">
                     {time}
                   </div>
                   {professionals.map(prof => {
-                    const appointment = getAppointmentForSlot(time, prof.id);
-                    return (
-                      <div key={`${time}-${prof.id}`} className="p-2 min-h-[60px] border-r border-b time-slot">
-                        {appointment ? (
-                          <AppointmentTooltip appointment={appointment}>
-                            <div 
-                              className={`appointment-block relative p-2 rounded-lg text-xs cursor-pointer hover-scale ${
-                                appointment.status === 'confirmed' 
-                                  ? 'bg-primary/10 border border-primary/20' 
-                                  : 'bg-yellow-50 border border-yellow-200'
-                              }`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditAppointment(appointment);
-                              }}
-                            >
-                              <button
-                                className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center hover:bg-destructive/80 transition-colors hover-scale z-10"
-                                onClick={() => handleDeleteAppointment(time, prof.id)}
-                              >
+                  const appointment = getAppointmentForSlot(time, prof.id);
+                  return <div key={`${time}-${prof.id}`} className="p-2 min-h-[60px] border-r border-b time-slot">
+                        {appointment ? <AppointmentTooltip appointment={appointment}>
+                            <div className={`appointment-block relative p-2 rounded-lg text-xs cursor-pointer hover-scale ${appointment.status === 'confirmed' ? 'bg-primary/10 border border-primary/20' : 'bg-yellow-50 border border-yellow-200'}`} onClick={e => {
+                        e.stopPropagation();
+                        handleEditAppointment(appointment);
+                      }}>
+                              <button className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center hover:bg-destructive/80 transition-colors hover-scale z-10" onClick={() => handleDeleteAppointment(time, prof.id)}>
                                 <X className="h-3 w-3" />
                               </button>
                               <div className="font-medium text-foreground">{appointment.client}</div>
                               <div className="text-muted-foreground">{appointment.service}</div>
-                              <Badge 
-                                variant={appointment.status === 'confirmed' ? 'default' : 'secondary'}
-                                className="mt-1 text-[10px]"
-                              >
+                              <Badge variant={appointment.status === 'confirmed' ? 'default' : 'secondary'} className="mt-1 text-[10px]">
                                 {appointment.status === 'confirmed' ? 'Confirmado' : 'Pendente'}
                               </Badge>
                             </div>
-                          </AppointmentTooltip>
-                        ) : (
-                          <div 
-                            className="h-full flex items-center justify-center text-muted-foreground hover:bg-muted/50 rounded-lg cursor-pointer transition-colors hover-scale"
-                            onClick={() => handleNewAppointmentClick(time, prof.id)}
-                          >
+                          </AppointmentTooltip> : <div className="h-full flex items-center justify-center text-muted-foreground hover:bg-muted/50 rounded-lg cursor-pointer transition-colors hover-scale" onClick={() => handleNewAppointmentClick(time, prof.id)}>
                             <Plus className="h-4 w-4" />
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </React.Fragment>
-              ))}
+                          </div>}
+                      </div>;
+                })}
+                </React.Fragment>)}
               </div>
             </div>
           </div>
@@ -256,16 +246,11 @@ const Dashboard = () => {
       </Card>
 
       {/* Modal de Novo Agendamento */}
-      <NewAppointmentModal
-        isOpen={isNewAppointmentModalOpen}
-        onClose={() => {
-          setIsNewAppointmentModalOpen(false);
-          setEditingAppointment(undefined);
-          setPrefilledAppointmentData(undefined);
-        }}
-        prefilledData={prefilledAppointmentData}
-        editingAppointment={editingAppointment}
-      />
+      <NewAppointmentModal isOpen={isNewAppointmentModalOpen} onClose={() => {
+      setIsNewAppointmentModalOpen(false);
+      setEditingAppointment(undefined);
+      setPrefilledAppointmentData(undefined);
+    }} prefilledData={prefilledAppointmentData} editingAppointment={editingAppointment} />
 
       {/* Dialog de Confirmação de Exclusão */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
@@ -284,8 +269,6 @@ const Dashboard = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
-  );
+    </div>;
 };
-
 export default Dashboard;
