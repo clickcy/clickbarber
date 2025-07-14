@@ -16,6 +16,17 @@ import { Plus, Search, Phone, Mail, Calendar, Filter } from "lucide-react";
 import ClientModal from "@/components/ClientModal";
 import { useToast } from "@/hooks/use-toast";
 
+type ModalClient = {
+  id?: number;
+  name: string;
+  phone: string;
+  email: string;
+  status: string;
+  cpf: string;
+  birth_date: string;
+  gender: string;
+};
+
 interface Client {
   id: number;
   name: string;
@@ -24,12 +35,15 @@ interface Client {
   lastVisit: string;
   totalVisits: number;
   status: string;
+  cpf?: string;
+  birth_date?: string;
+  gender?: string;
 }
 
 const Clients = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [editingClient, setEditingClient] = useState<ModalClient | null>(null);
   const [clients, setClients] = useState<Client[]>([
     {
       id: 1,
@@ -95,16 +109,36 @@ const Clients = () => {
   };
 
   const handleEditClient = (client: Client) => {
-    setEditingClient(client);
+    // Mapear do formato da página para o formato do modal
+    const modalClient = {
+      id: client.id,
+      name: client.name,
+      phone: client.phone,
+      email: client.email,
+      status: client.status,
+      cpf: client.cpf || "",
+      birth_date: client.birth_date || "",
+      gender: client.gender || ""
+    };
+    setEditingClient(modalClient as any);
     setIsModalOpen(true);
   };
 
-  const handleSaveClient = (clientData: Omit<Client, 'id' | 'lastVisit' | 'totalVisits'> & { id?: number }) => {
+  const handleSaveClient = (clientData: any) => {
     if (clientData.id) {
       // Editando cliente existente
       setClients(prev => prev.map(c => 
         c.id === clientData.id 
-          ? { ...c, ...clientData }
+          ? { 
+              ...c, 
+              name: clientData.name,
+              phone: clientData.phone,
+              email: clientData.email,
+              status: clientData.status,
+              cpf: clientData.cpf,
+              birth_date: clientData.birth_date,
+              gender: clientData.gender
+            }
           : c
       ));
       toast({
@@ -114,8 +148,14 @@ const Clients = () => {
     } else {
       // Criando novo cliente
       const newClient: Client = {
-        ...clientData,
         id: Math.max(...clients.map(c => c.id)) + 1,
+        name: clientData.name,
+        phone: clientData.phone,
+        email: clientData.email,
+        status: clientData.status,
+        cpf: clientData.cpf,
+        birth_date: clientData.birth_date,
+        gender: clientData.gender,
         lastVisit: new Date().toISOString().split('T')[0],
         totalVisits: 0,
       };

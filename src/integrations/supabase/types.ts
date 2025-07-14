@@ -94,24 +94,33 @@ export type Database = {
       }
       clients: {
         Row: {
+          birth_date: string | null
+          cpf: string | null
           created_at: string
           email: string | null
+          gender: string | null
           id: string
           last_visit_date: string | null
           name: string
           phone: string | null
         }
         Insert: {
+          birth_date?: string | null
+          cpf?: string | null
           created_at?: string
           email?: string | null
+          gender?: string | null
           id?: string
           last_visit_date?: string | null
           name: string
           phone?: string | null
         }
         Update: {
+          birth_date?: string | null
+          cpf?: string | null
           created_at?: string
           email?: string | null
+          gender?: string | null
           id?: string
           last_visit_date?: string | null
           name?: string
