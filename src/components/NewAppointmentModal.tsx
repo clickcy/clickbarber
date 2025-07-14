@@ -217,21 +217,42 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
               </Select>
             </div>
 
-            {/* Duração */}
+            {/* Cliente */}
             <div className="space-y-2">
-              <Label htmlFor="duration">Duração (minutos)</Label>
-              <Input
-                id="duration"
-                type="number"
-                min="1"
-                value={totalDuration || ""}
-                onChange={(e) => setCustomDuration(parseInt(e.target.value) || 0)}
-                placeholder="Duração em minutos"
-              />
-              {totalServiceDuration > 0 && totalDuration !== totalServiceDuration && (
-                <p className="text-xs text-muted-foreground">
-                  Duração sugerida: {totalServiceDuration}min
-                </p>
+              <Label>Cliente</Label>
+              <div className="flex gap-2">
+                <Input
+                  className="flex-1"
+                  placeholder="Buscar cliente por nome ou telefone"
+                  value={clientSearch}
+                  onChange={(e) => setClientSearch(e.target.value)}
+                />
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={() => setShowNewClientModal(true)}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Lista de clientes filtrados */}
+              {clientSearch && (
+                <div className="border rounded-md max-h-32 overflow-y-auto">
+                  {filteredClients.map(client => (
+                    <div
+                      key={client.id}
+                      className={`p-2 cursor-pointer hover:bg-muted ${selectedClient === client.id.toString() ? 'bg-primary/10' : ''}`}
+                      onClick={() => {
+                        setSelectedClient(client.id.toString());
+                        setClientSearch(client.name);
+                      }}
+                    >
+                      <div className="font-medium">{client.name}</div>
+                      <div className="text-sm text-muted-foreground">{client.phone}</div>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>
@@ -275,42 +296,21 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
 
 
           <div className="grid grid-cols-2 gap-4">
-            {/* Cliente */}
+            {/* Duração */}
             <div className="space-y-2">
-              <Label>Cliente</Label>
-              <div className="flex gap-2">
-                <Input
-                  className="flex-1"
-                  placeholder="Buscar cliente por nome ou telefone"
-                  value={clientSearch}
-                  onChange={(e) => setClientSearch(e.target.value)}
-                />
-                <Button 
-                  variant="outline" 
-                  size="icon"
-                  onClick={() => setShowNewClientModal(true)}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-
-              {/* Lista de clientes filtrados */}
-              {clientSearch && (
-                <div className="border rounded-md max-h-32 overflow-y-auto">
-                  {filteredClients.map(client => (
-                    <div
-                      key={client.id}
-                      className={`p-2 cursor-pointer hover:bg-muted ${selectedClient === client.id.toString() ? 'bg-primary/10' : ''}`}
-                      onClick={() => {
-                        setSelectedClient(client.id.toString());
-                        setClientSearch(client.name);
-                      }}
-                    >
-                      <div className="font-medium">{client.name}</div>
-                      <div className="text-sm text-muted-foreground">{client.phone}</div>
-                    </div>
-                  ))}
-                </div>
+              <Label htmlFor="duration">Duração (minutos)</Label>
+              <Input
+                id="duration"
+                type="number"
+                min="1"
+                value={totalDuration || ""}
+                onChange={(e) => setCustomDuration(parseInt(e.target.value) || 0)}
+                placeholder="Duração em minutos"
+              />
+              {totalServiceDuration > 0 && totalDuration !== totalServiceDuration && (
+                <p className="text-xs text-muted-foreground">
+                  Duração sugerida: {totalServiceDuration}min
+                </p>
               )}
             </div>
 
