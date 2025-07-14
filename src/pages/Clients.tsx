@@ -13,12 +13,24 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Plus, Search, Phone, Mail, Calendar, Filter } from "lucide-react";
+import ClientModal from "@/components/ClientModal";
+import { useToast } from "@/hooks/use-toast";
+
+interface Client {
+  id: number;
+  name: string;
+  phone: string;
+  email: string;
+  lastVisit: string;
+  totalVisits: number;
+  status: string;
+}
 
 const Clients = () => {
   const [searchTerm, setSearchTerm] = useState("");
-
-  // Dados mockados para demonstração
-  const mockClients = [
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [clients, setClients] = useState<Client[]>([
     {
       id: 1,
       name: "Carlos Alberto Silva",
@@ -55,9 +67,10 @@ const Clients = () => {
       totalVisits: 22,
       status: "VIP"
     }
-  ];
+  ]);
+  const { toast } = useToast();
 
-  const filteredClients = mockClients.filter(client =>
+  const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     client.phone.includes(searchTerm) ||
     client.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -76,6 +89,44 @@ const Clients = () => {
     }
   };
 
+  const handleNewClient = () => {
+    setEditingClient(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEditClient = (client: Client) => {
+    setEditingClient(client);
+    setIsModalOpen(true);
+  };
+
+  const handleSaveClient = (clientData: Omit<Client, 'id' | 'lastVisit' | 'totalVisits'> & { id?: number }) => {
+    if (clientData.id) {
+      // Editando cliente existente
+      setClients(prev => prev.map(c => 
+        c.id === clientData.id 
+          ? { ...c, ...clientData }
+          : c
+      ));
+      toast({
+        title: "Cliente atualizado",
+        description: "As informações do cliente foram atualizadas com sucesso.",
+      });
+    } else {
+      // Criando novo cliente
+      const newClient: Client = {
+        ...clientData,
+        id: Math.max(...clients.map(c => c.id)) + 1,
+        lastVisit: new Date().toISOString().split('T')[0],
+        totalVisits: 0,
+      };
+      setClients(prev => [...prev, newClient]);
+      toast({
+        title: "Cliente cadastrado",
+        description: "Novo cliente foi cadastrado com sucesso.",
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -84,7 +135,7 @@ const Clients = () => {
           <h1 className="text-3xl font-bold text-foreground">Clientes</h1>
           <p className="text-muted-foreground">Gerencie sua base de clientes</p>
         </div>
-        <Button className="gradient-bg hover:opacity-90">
+        <Button className="gradient-bg hover:opacity-90" onClick={handleNewClient}>
           <Plus className="h-4 w-4 mr-2" />
           Adicionar Cliente
         </Button>
@@ -97,7 +148,7 @@ const Clients = () => {
             <CardTitle className="text-sm font-medium">Total de Clientes</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary">{mockClients.length}</div>
+            <div className="text-2xl font-bold text-primary">{clients.length}</div>
           </CardContent>
         </Card>
 
@@ -107,7 +158,7 @@ const Clients = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-primary">
-              {mockClients.filter(c => c.status === "Ativo").length}
+              {clients.filter(c => c.status === "Ativo").length}
             </div>
           </CardContent>
         </Card>
@@ -118,7 +169,7 @@ const Clients = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-primary">
-              {mockClients.filter(c => c.status === "VIP").length}
+              {clients.filter(c => c.status === "VIP").length}
             </div>
           </CardContent>
         </Card>
@@ -200,7 +251,7 @@ const Clients = () => {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" onClick={() => handleEditClient(client)}>
                         Editar
                       </Button>
                     </TableCell>
@@ -217,6 +268,14 @@ const Clients = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Modal de Cliente */}
+      <ClientModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveClient}
+        editingClient={editingClient}
+      />
     </div>
   );
 };
