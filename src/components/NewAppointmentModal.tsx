@@ -75,9 +75,13 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
   const [time, setTime] = useState("");
   const [clientSearch, setClientSearch] = useState("");
   const [showNewClientModal, setShowNewClientModal] = useState(false);
+  const [customDuration, setCustomDuration] = useState<number>(0);
 
   // Calcular duração total dos serviços
-  const totalDuration = selectedServices.reduce((total, service) => total + service.duration_minutes, 0);
+  const totalServiceDuration = selectedServices.reduce((total, service) => total + service.duration_minutes, 0);
+  
+  // Usar duração customizada se definida, senão usar duração dos serviços
+  const totalDuration = customDuration > 0 ? customDuration : totalServiceDuration;
 
   // Pré-preencher campos quando modal abrir
   useEffect(() => {
@@ -98,6 +102,7 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
       const service = mockServices.find(s => s.name === editingAppointment.service);
       if (service) {
         setSelectedServices([service]);
+        setCustomDuration(service.duration_minutes);
       }
     }
   }, [prefilledData, editingAppointment, isOpen]);
@@ -112,18 +117,27 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
       setDate("");
       setTime("");
       setSelectedProfessional("");
+      setCustomDuration(0);
     }
   }, [isOpen]);
 
   const addService = (serviceId: string) => {
     const service = mockServices.find(s => s.id.toString() === serviceId);
     if (service && !selectedServices.find(s => s.id === service.id)) {
-      setSelectedServices([...selectedServices, service]);
+      const newServices = [...selectedServices, service];
+      setSelectedServices(newServices);
+      // Atualizar duração automaticamente quando adicionar serviço
+      const newTotalDuration = newServices.reduce((total, s) => total + s.duration_minutes, 0);
+      setCustomDuration(newTotalDuration);
     }
   };
 
   const removeService = (serviceId: number) => {
-    setSelectedServices(selectedServices.filter(s => s.id !== serviceId));
+    const newServices = selectedServices.filter(s => s.id !== serviceId);
+    setSelectedServices(newServices);
+    // Atualizar duração automaticamente quando remover serviço
+    const newTotalDuration = newServices.reduce((total, s) => total + s.duration_minutes, 0);
+    setCustomDuration(newTotalDuration);
   };
 
   const handleSubmit = () => {
@@ -241,12 +255,20 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
 
           {/* Duração */}
           <div className="space-y-2">
-            <Label>Duração</Label>
+            <Label htmlFor="duration">Duração (minutos)</Label>
             <Input
-              value={totalDuration > 0 ? `${totalDuration} minutos` : ""}
-              disabled
-              placeholder="Duração será calculada automaticamente"
+              id="duration"
+              type="number"
+              min="1"
+              value={totalDuration || ""}
+              onChange={(e) => setCustomDuration(parseInt(e.target.value) || 0)}
+              placeholder="Duração em minutos"
             />
+            {totalServiceDuration > 0 && totalDuration !== totalServiceDuration && (
+              <p className="text-xs text-muted-foreground">
+                Duração sugerida pelos serviços: {totalServiceDuration} minutos
+              </p>
+            )}
           </div>
 
           {/* Cliente */}
