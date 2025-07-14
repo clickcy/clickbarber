@@ -88,4 +88,30 @@
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   }
+  
+  .hover-scale {
+    transition: transform 0.2s ease;
+  }
+  
+  .hover-scale:hover {
+    transform: scale(1.05);
+  }
+  
+  .appointment-block {
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  
+  .appointment-block:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .time-slot {
+    transition: background-color 0.2s ease;
+  }
+  
+  .time-slot:hover {
+    background-color: hsl(var(--muted));
+  }
 }

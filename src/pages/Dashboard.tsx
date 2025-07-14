@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Calendar, Clock, Users, DollarSign, TrendingUp, Plus, X } from "lucide-react";
 import NewAppointmentModal from "@/components/NewAppointmentModal";
+import { DateNavigation } from "@/components/DateNavigation";
+import { AppointmentTooltip } from "@/components/AppointmentTooltip";
+import { CurrentTimeIndicator } from "@/components/CurrentTimeIndicator";
 
 const Dashboard = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -97,6 +100,12 @@ const Dashboard = () => {
               day: 'numeric' 
             })}
           </p>
+          <div className="mt-3">
+            <DateNavigation 
+              selectedDate={selectedDate} 
+              onDateChange={setSelectedDate}
+            />
+          </div>
         </div>
         <Button className="gradient-bg hover:opacity-90" onClick={handleNewAppointmentFromButton}>
           <Plus className="h-4 w-4 mr-2" />
@@ -164,7 +173,9 @@ const Dashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <div className="grid grid-cols-[100px_repeat(3,1fr)] gap-2 min-w-[600px]">
+            <div className="relative">
+              <CurrentTimeIndicator timeSlots={timeSlots} />
+              <div className="grid grid-cols-[100px_repeat(3,1fr)] gap-2 min-w-[600px]">
               {/* Header */}
               <div className="p-3 font-medium text-center border-b">Horário</div>
               {professionals.map(prof => (
@@ -187,31 +198,33 @@ const Dashboard = () => {
                   {professionals.map(prof => {
                     const appointment = getAppointmentForSlot(time, prof.id);
                     return (
-                      <div key={`${time}-${prof.id}`} className="p-2 min-h-[60px] border-r border-b">
+                      <div key={`${time}-${prof.id}`} className="p-2 min-h-[60px] border-r border-b time-slot">
                         {appointment ? (
-                          <div className={`relative p-2 rounded-lg text-xs ${
-                            appointment.status === 'confirmed' 
-                              ? 'bg-primary/10 border border-primary/20' 
-                              : 'bg-yellow-50 border border-yellow-200'
-                          }`}>
-                            <button
-                              className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center hover:bg-destructive/80 transition-colors"
-                              onClick={() => handleDeleteAppointment(time, prof.id)}
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                            <div className="font-medium text-foreground">{appointment.client}</div>
-                            <div className="text-muted-foreground">{appointment.service}</div>
-                            <Badge 
-                              variant={appointment.status === 'confirmed' ? 'default' : 'secondary'}
-                              className="mt-1 text-[10px]"
-                            >
-                              {appointment.status === 'confirmed' ? 'Confirmado' : 'Pendente'}
-                            </Badge>
-                          </div>
+                          <AppointmentTooltip appointment={appointment}>
+                            <div className={`appointment-block relative p-2 rounded-lg text-xs ${
+                              appointment.status === 'confirmed' 
+                                ? 'bg-primary/10 border border-primary/20' 
+                                : 'bg-yellow-50 border border-yellow-200'
+                            }`}>
+                              <button
+                                className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center hover:bg-destructive/80 transition-colors hover-scale z-10"
+                                onClick={() => handleDeleteAppointment(time, prof.id)}
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                              <div className="font-medium text-foreground">{appointment.client}</div>
+                              <div className="text-muted-foreground">{appointment.service}</div>
+                              <Badge 
+                                variant={appointment.status === 'confirmed' ? 'default' : 'secondary'}
+                                className="mt-1 text-[10px]"
+                              >
+                                {appointment.status === 'confirmed' ? 'Confirmado' : 'Pendente'}
+                              </Badge>
+                            </div>
+                          </AppointmentTooltip>
                         ) : (
                           <div 
-                            className="h-full flex items-center justify-center text-muted-foreground hover:bg-muted/50 rounded-lg cursor-pointer transition-colors"
+                            className="h-full flex items-center justify-center text-muted-foreground hover:bg-muted/50 rounded-lg cursor-pointer transition-colors hover-scale"
                             onClick={() => handleNewAppointmentClick(time, prof.id)}
                           >
                             <Plus className="h-4 w-4" />
@@ -222,6 +235,7 @@ const Dashboard = () => {
                   })}
                 </React.Fragment>
               ))}
+              </div>
             </div>
           </div>
         </CardContent>
