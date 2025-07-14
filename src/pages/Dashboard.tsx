@@ -229,9 +229,7 @@ const Dashboard = () => {
                               </button>
                               <div className="font-medium text-foreground">{appointment.client}</div>
                               <div className="text-muted-foreground">{appointment.service}</div>
-                              <Badge variant={appointment.status === 'confirmed' ? 'default' : 'secondary'} className="mt-1 text-[10px]">
-                                {appointment.status === 'confirmed' ? 'Confirmado' : 'Pendente'}
-                              </Badge>
+                              
                             </div>
                           </AppointmentTooltip> : <div className="h-full flex items-center justify-center text-muted-foreground hover:bg-muted/50 rounded-lg cursor-pointer transition-colors hover-scale" onClick={() => handleNewAppointmentClick(time, prof.id)}>
                             <Plus className="h-4 w-4" />
