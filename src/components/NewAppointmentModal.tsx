@@ -274,54 +274,56 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
           </div>
 
 
-          {/* Cliente */}
-          <div className="space-y-2">
-            <Label>Cliente</Label>
-            <div className="flex gap-2">
-              <Input
-                className="flex-1"
-                placeholder="Buscar cliente por nome ou telefone"
-                value={clientSearch}
-                onChange={(e) => setClientSearch(e.target.value)}
-              />
-              <Button 
-                variant="outline" 
-                size="icon"
-                onClick={() => setShowNewClientModal(true)}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
+          <div className="grid grid-cols-2 gap-4">
+            {/* Cliente */}
+            <div className="space-y-2">
+              <Label>Cliente</Label>
+              <div className="flex gap-2">
+                <Input
+                  className="flex-1"
+                  placeholder="Buscar cliente por nome ou telefone"
+                  value={clientSearch}
+                  onChange={(e) => setClientSearch(e.target.value)}
+                />
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={() => setShowNewClientModal(true)}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Lista de clientes filtrados */}
+              {clientSearch && (
+                <div className="border rounded-md max-h-32 overflow-y-auto">
+                  {filteredClients.map(client => (
+                    <div
+                      key={client.id}
+                      className={`p-2 cursor-pointer hover:bg-muted ${selectedClient === client.id.toString() ? 'bg-primary/10' : ''}`}
+                      onClick={() => {
+                        setSelectedClient(client.id.toString());
+                        setClientSearch(client.name);
+                      }}
+                    >
+                      <div className="font-medium">{client.name}</div>
+                      <div className="text-sm text-muted-foreground">{client.phone}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Lista de clientes filtrados */}
-            {clientSearch && (
-              <div className="border rounded-md max-h-32 overflow-y-auto">
-                {filteredClients.map(client => (
-                  <div
-                    key={client.id}
-                    className={`p-2 cursor-pointer hover:bg-muted ${selectedClient === client.id.toString() ? 'bg-primary/10' : ''}`}
-                    onClick={() => {
-                      setSelectedClient(client.id.toString());
-                      setClientSearch(client.name);
-                    }}
-                  >
-                    <div className="font-medium">{client.name}</div>
-                    <div className="text-sm text-muted-foreground">{client.phone}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Observações */}
-          <div className="space-y-2">
-            <Label htmlFor="observations">Observações</Label>
-            <Textarea
-              id="observations"
-              placeholder="Notas adicionais sobre o agendamento..."
-              value={observations}
-              onChange={(e) => setObservations(e.target.value)}
-            />
+            {/* Observações */}
+            <div className="space-y-2">
+              <Label htmlFor="observations">Observações</Label>
+              <Textarea
+                id="observations"
+                placeholder="Notas adicionais sobre o agendamento..."
+                value={observations}
+                onChange={(e) => setObservations(e.target.value)}
+              />
+            </div>
           </div>
 
           {/* Botão Agendar */}
