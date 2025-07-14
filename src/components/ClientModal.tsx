@@ -95,8 +95,8 @@ const ClientModal = ({ isOpen, onClose, onSave, editingClient }: ClientModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] max-h-[90vh] flex flex-col">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[425px] max-h-[85vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>
             {isEditing ? "Editar Cliente" : "Novo Cliente"}
           </DialogTitle>
@@ -108,8 +108,8 @@ const ClientModal = ({ isOpen, onClose, onSave, editingClient }: ClientModalProp
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 pr-4">
-          <div className="grid gap-4 py-4">
+        <ScrollArea className="flex-1 max-h-[50vh]">
+          <div className="grid gap-4 py-4 pr-6">
           {/* Nome */}
           <div className="space-y-2">
             <Label htmlFor="name">Nome</Label>
