@@ -8,6 +8,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Dialog,
   DialogContent,
@@ -94,7 +95,7 @@ const ClientModal = ({ isOpen, onClose, onSave, editingClient }: ClientModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>
             {isEditing ? "Editar Cliente" : "Novo Cliente"}
@@ -107,7 +108,8 @@ const ClientModal = ({ isOpen, onClose, onSave, editingClient }: ClientModalProp
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <ScrollArea className="flex-1 pr-4">
+          <div className="grid gap-4 py-4">
           {/* Nome */}
           <div className="space-y-2">
             <Label htmlFor="name">Nome</Label>
@@ -211,8 +213,9 @@ const ClientModal = ({ isOpen, onClose, onSave, editingClient }: ClientModalProp
             </Select>
           </div>
         </div>
+        </ScrollArea>
 
-        <DialogFooter>
+        <DialogFooter className="mt-4">
           <Button variant="outline" onClick={onClose}>
             Cancelar
           </Button>
