@@ -141,7 +141,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent className="pb-2">
             <div className="text-xl font-bold text-primary">{todayStats.appointments}</div>
-            <p className="text-xs text-muted-foreground">+2 em relação a ontem</p>
+            
           </CardContent>
         </Card>
 
@@ -152,7 +152,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent className="pb-2">
             <div className="text-xl font-bold text-primary">{todayStats.clients}</div>
-            <p className="text-xs text-muted-foreground">67% dos agendamentos</p>
+            
           </CardContent>
         </Card>
 
@@ -163,7 +163,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent className="pb-2">
             <div className="text-xl font-bold text-primary">R$ {todayStats.revenue}</div>
-            <p className="text-xs text-muted-foreground">Meta: R$ 1.000</p>
+            
           </CardContent>
         </Card>
       </div>
