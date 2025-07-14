@@ -238,7 +238,8 @@ const Dashboard = () => {
                   </div>)}
 
                 {/* Timeline Container */}
-                {timeSlots.map(hour => <React.Fragment key={hour}>
+                {timeSlots.map(hour => (
+                  <div key={hour} className="contents">
                     {/* Hora Label */}
                     <div className="relative border-r border-b bg-background">
                       <div className="absolute top-0 left-3 -mt-2 text-sm font-medium text-muted-foreground bg-background px-1">
@@ -254,10 +255,14 @@ const Dashboard = () => {
                     
                     {/* Colunas dos Profissionais */}
                     {professionals.map(prof => {
-                const professionalAppointments = getAppointmentsForProfessional(prof.id);
-                return <div key={`${hour}-${prof.id}`} className="relative border-r border-b hover:bg-muted/30 cursor-pointer transition-all duration-200 hover:shadow-inner" style={{
-                  height: '60px'
-                }} onClick={e => handleTimelineClick(e, prof.id)}>
+                      const professionalAppointments = getAppointmentsForProfessional(prof.id);
+                      return (
+                        <div 
+                          key={`${hour}-${prof.id}`} 
+                          className="relative border-r border-b hover:bg-muted/30 cursor-pointer transition-all duration-200 hover:shadow-inner hover:scale-[1.01]" 
+                          style={{ height: '60px' }} 
+                          onClick={(e) => handleTimelineClick(e, prof.id)}
+                        >
                           {/* Linhas de guia de 15 em 15 min */}
                           <div className="absolute top-[15px] left-0 right-0 h-px bg-border/30"></div>
                           <div className="absolute top-[30px] left-0 right-0 h-px bg-border/50"></div>
@@ -268,55 +273,76 @@ const Dashboard = () => {
                           
                           {/* Renderizar agendamentos que ocupam este slot de hora */}
                           {professionalAppointments.map(appointment => {
-                    const appointmentStart = new Date(appointment.start_time);
-                    const appointmentEnd = new Date(appointment.end_time);
-                    const currentHourStart = new Date(selectedDate);
-                    currentHourStart.setHours(hour, 0, 0, 0);
-                    const currentHourEnd = new Date(selectedDate);
-                    currentHourEnd.setHours(hour + 1, 0, 0, 0);
+                            const appointmentStart = new Date(appointment.start_time);
+                            const appointmentEnd = new Date(appointment.end_time);
+                            const currentHourStart = new Date(selectedDate);
+                            currentHourStart.setHours(hour, 0, 0, 0);
+                            const currentHourEnd = new Date(selectedDate);
+                            currentHourEnd.setHours(hour + 1, 0, 0, 0);
 
-                    // Verificar se o agendamento intercepta esta hora
-                    const hasIntersection = appointmentStart < currentHourEnd && appointmentEnd > currentHourStart;
-                    if (!hasIntersection) return null;
+                            // Verificar se o agendamento intercepta esta hora
+                            const hasIntersection = appointmentStart < currentHourEnd && appointmentEnd > currentHourStart;
+                            if (!hasIntersection) return null;
 
-                    // Calcular posição e altura relativas a esta hora
-                    const startMinuteInHour = appointmentStart >= currentHourStart ? appointmentStart.getMinutes() : 0;
-                    const endMinuteInHour = appointmentEnd <= currentHourEnd ? appointmentEnd.getMinutes() : 60;
-                    const topPosition = startMinuteInHour;
-                    const height = endMinuteInHour - startMinuteInHour;
-                    return <AppointmentTooltip key={appointment.id} appointment={appointment}>
-                              <div className={`absolute left-1 right-1 rounded-md shadow-sm border z-20 group hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer ${appointment.status === 'agendado' || appointment.status === 'confirmado' ? 'bg-primary text-primary-foreground border-primary/30 hover:bg-primary/90' : 'bg-yellow-500 text-white border-yellow-400 hover:bg-yellow-400'}`} style={{
-                                top: `${topPosition}px`,
-                                height: `${Math.max(height, 20)}px`
-                              }} onClick={e => e.stopPropagation()}>
-                                <button className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center hover:bg-destructive/80 hover:scale-110 transition-all duration-200 shadow-sm z-30" onClick={e => {
-                                  e.stopPropagation();
-                                  handleDeleteAppointment(appointment.id, format(appointmentStart, 'HH:mm'), prof.id);
-                                }}>
-                                  <X className="h-2.5 w-2.5" />
-                                </button>
-                                <div className="p-1.5 h-full flex flex-col justify-center">
-                                  <div className="font-semibold leading-tight text-xs truncate">
-                                    {format(appointmentStart, 'HH:mm')} - {appointment.client.name}
+                            // Calcular posição e altura relativas a esta hora
+                            const startMinuteInHour = appointmentStart >= currentHourStart ? appointmentStart.getMinutes() : 0;
+                            const endMinuteInHour = appointmentEnd <= currentHourEnd ? appointmentEnd.getMinutes() : 60;
+                            const topPosition = startMinuteInHour;
+                            const height = endMinuteInHour - startMinuteInHour;
+                            
+                            return (
+                              <AppointmentTooltip key={appointment.id} appointment={appointment}>
+                                <div 
+                                  className={`absolute left-1 right-1 rounded-md shadow-sm border z-20 group hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer ${
+                                    appointment.status === 'agendado' || appointment.status === 'confirmado' 
+                                      ? 'bg-primary text-primary-foreground border-primary/30 hover:bg-primary/90' 
+                                      : 'bg-yellow-500 text-white border-yellow-400 hover:bg-yellow-400'
+                                  }`} 
+                                  style={{
+                                    top: `${topPosition}px`,
+                                    height: `${Math.max(height, 20)}px`
+                                  }} 
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <button 
+                                    className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center hover:bg-destructive/80 hover:scale-110 transition-all duration-200 shadow-sm z-30" 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteAppointment(appointment.id, format(appointmentStart, 'HH:mm'), prof.id);
+                                    }}
+                                  >
+                                    <X className="h-2.5 w-2.5" />
+                                  </button>
+                                  <div className="p-1.5 h-full flex flex-col justify-center">
+                                    <div className="font-semibold leading-tight text-xs truncate">
+                                      {format(appointmentStart, 'HH:mm')} - {appointment.client.name}
+                                    </div>
+                                    <div className="text-[10px] opacity-90 leading-tight truncate mt-0.5">
+                                      {appointment.services.map(s => s.name).join(', ')}
+                                    </div>
+                                    {height >= 35 && (
+                                      <div className="mt-1">
+                                        <Badge 
+                                          variant={appointment.status === 'confirmado' ? 'secondary' : 'outline'} 
+                                          className="text-[8px] h-4 px-1 py-0 bg-white/20 text-white border-white/30"
+                                        >
+                                          {appointment.status === 'confirmado' ? 'Confirmado' : 'Agendado'}
+                                        </Badge>
+                                      </div>
+                                    )}
                                   </div>
-                                  <div className="text-[10px] opacity-90 leading-tight truncate mt-0.5">
-                                    {appointment.services.map(s => s.name).join(', ')}
-                                  </div>
-                                  {height >= 35 && <div className="mt-1">
-                                      <Badge variant={appointment.status === 'confirmado' ? 'secondary' : 'outline'} className="text-[8px] h-4 px-1 py-0 bg-white/20 text-white border-white/30">
-                                        {appointment.status === 'confirmado' ? 'Confirmado' : 'Agendado'}
-                                      </Badge>
-                                    </div>}
                                 </div>
-                              </div>
-                            </AppointmentTooltip>;
-                  })}
+                              </AppointmentTooltip>
+                            );
+                          })}
                           
                           {/* Área clicável invisível para novos agendamentos */}
                           <div className="absolute inset-0 z-10"></div>
-                        </div>;
-              })}
-                  </React.Fragment>)}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
               </div>
             </div>}
         </CardContent>
