@@ -156,47 +156,7 @@ const Clients = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="hover-lift">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total de Clientes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">{clients.length}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="hover-lift">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Clientes Ativos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">
-              {clients.filter(c => c.status === "Ativo").length}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="hover-lift">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Clientes VIP</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">
-              {clients.filter(c => c.status === "VIP").length}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="hover-lift">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Novos Este Mês</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">6</div>
-          </CardContent>
-        </Card>
-      </div>
+      
 
       {/* Search and Filters */}
       <Card>
