@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -9,26 +8,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Plus, X } from "lucide-react";
 import { format } from "date-fns";
-
 interface Service {
   id: number;
   name: string;
   duration_minutes: number;
   price: number;
 }
-
 interface Professional {
   id: number;
   name: string;
 }
-
 interface Client {
   id: number;
   name: string;
   phone: string;
   email: string;
 }
-
 interface NewAppointmentModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -47,26 +42,59 @@ interface NewAppointmentModalProps {
 }
 
 // Mock data - em produção virá do Supabase
-const mockServices: Service[] = [
-  { id: 1, name: "Corte", duration_minutes: 30, price: 25 },
-  { id: 2, name: "Barba", duration_minutes: 20, price: 15 },
-  { id: 3, name: "Corte + Barba", duration_minutes: 45, price: 35 },
-  { id: 4, name: "Hidratação", duration_minutes: 40, price: 30 },
-];
-
-const mockProfessionals: Professional[] = [
-  { id: 1, name: "João Silva" },
-  { id: 2, name: "Maria Santos" },
-  { id: 3, name: "Pedro Costa" },
-];
-
-const mockClients: Client[] = [
-  { id: 1, name: "Carlos Alberto", phone: "(11) 99999-1111", email: "carlos@email.com" },
-  { id: 2, name: "Roberto Silva", phone: "(11) 99999-2222", email: "roberto@email.com" },
-  { id: 3, name: "José Santos", phone: "(11) 99999-3333", email: "jose@email.com" },
-];
-
-const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointment }: NewAppointmentModalProps) => {
+const mockServices: Service[] = [{
+  id: 1,
+  name: "Corte",
+  duration_minutes: 30,
+  price: 25
+}, {
+  id: 2,
+  name: "Barba",
+  duration_minutes: 20,
+  price: 15
+}, {
+  id: 3,
+  name: "Corte + Barba",
+  duration_minutes: 45,
+  price: 35
+}, {
+  id: 4,
+  name: "Hidratação",
+  duration_minutes: 40,
+  price: 30
+}];
+const mockProfessionals: Professional[] = [{
+  id: 1,
+  name: "João Silva"
+}, {
+  id: 2,
+  name: "Maria Santos"
+}, {
+  id: 3,
+  name: "Pedro Costa"
+}];
+const mockClients: Client[] = [{
+  id: 1,
+  name: "Carlos Alberto",
+  phone: "(11) 99999-1111",
+  email: "carlos@email.com"
+}, {
+  id: 2,
+  name: "Roberto Silva",
+  phone: "(11) 99999-2222",
+  email: "roberto@email.com"
+}, {
+  id: 3,
+  name: "José Santos",
+  phone: "(11) 99999-3333",
+  email: "jose@email.com"
+}];
+const NewAppointmentModal = ({
+  isOpen,
+  onClose,
+  prefilledData,
+  editingAppointment
+}: NewAppointmentModalProps) => {
   const [selectedServices, setSelectedServices] = useState<Service[]>([]);
   const [selectedClient, setSelectedClient] = useState<string>("");
   const [selectedProfessional, setSelectedProfessional] = useState<string>("");
@@ -79,7 +107,7 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
 
   // Calcular duração total dos serviços
   const totalServiceDuration = selectedServices.reduce((total, service) => total + service.duration_minutes, 0);
-  
+
   // Usar duração customizada se definida, senão usar duração dos serviços
   const totalDuration = customDuration > 0 ? customDuration : totalServiceDuration;
 
@@ -90,14 +118,14 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
       setTime(prefilledData.time);
       setSelectedProfessional(prefilledData.professionalId.toString());
     }
-    
+
     // Pré-preencher campos para edição
     if (editingAppointment && isOpen) {
       setTime(editingAppointment.time);
       setSelectedProfessional(editingAppointment.professional.toString());
       setClientSearch(editingAppointment.client);
       setSelectedClient(mockClients.find(c => c.name === editingAppointment.client)?.id.toString() || "");
-      
+
       // Encontrar serviço baseado no nome
       const service = mockServices.find(s => s.name === editingAppointment.service);
       if (service) {
@@ -120,7 +148,6 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
       setCustomDuration(0);
     }
   }, [isOpen]);
-
   const addService = (serviceId: string) => {
     const service = mockServices.find(s => s.id.toString() === serviceId);
     if (service && !selectedServices.find(s => s.id === service.id)) {
@@ -131,7 +158,6 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
       setCustomDuration(newTotalDuration);
     }
   };
-
   const removeService = (serviceId: number) => {
     const newServices = selectedServices.filter(s => s.id !== serviceId);
     setSelectedServices(newServices);
@@ -139,7 +165,6 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
     const newTotalDuration = newServices.reduce((total, s) => total + s.duration_minutes, 0);
     setCustomDuration(newTotalDuration);
   };
-
   const handleSubmit = () => {
     // Validação básica
     if (!selectedClient || !selectedProfessional || selectedServices.length === 0) {
@@ -161,32 +186,18 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
     // Fechar modal
     onClose();
   };
-
-  const filteredClients = mockClients.filter(client => 
-    client.name.toLowerCase().includes(clientSearch.toLowerCase()) ||
-    client.phone.includes(clientSearch)
-  );
-
-  return (
-    <>
+  const filteredClients = mockClients.filter(client => client.name.toLowerCase().includes(clientSearch.toLowerCase()) || client.phone.includes(clientSearch));
+  return <>
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between px-[15px]">
               <DialogTitle>{editingAppointment ? 'Editar Agendamento' : 'Agendar novo horário'}</DialogTitle>
               <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="bg-green-500 hover:bg-green-600 text-white border-green-500"
-                >
+                <Button variant="outline" size="sm" className="bg-green-500 hover:bg-green-600 text-white border-green-500">
                   Comanda
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="bg-blue-500 hover:bg-blue-600 text-white border-blue-500"
-                >
+                <Button variant="outline" size="sm" className="bg-blue-500 hover:bg-blue-600 text-white border-blue-500">
                   Produto
                 </Button>
               </div>
@@ -197,23 +208,13 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
             {/* Dia */}
             <div className="space-y-2">
               <Label htmlFor="date">Dia</Label>
-              <Input
-                id="date"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
+              <Input id="date" type="date" value={date} onChange={e => setDate(e.target.value)} />
             </div>
 
             {/* Hora Início */}
             <div className="space-y-2">
               <Label htmlFor="time">Hora Início</Label>
-              <Input
-                id="time"
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-              />
+              <Input id="time" type="time" value={time} onChange={e => setTime(e.target.value)} />
             </div>
           </div>
 
@@ -226,11 +227,9 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
                   <SelectValue placeholder="Selecione um profissional" />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockProfessionals.map(prof => (
-                    <SelectItem key={prof.id} value={prof.id.toString()}>
+                  {mockProfessionals.map(prof => <SelectItem key={prof.id} value={prof.id.toString()}>
                       {prof.name}
-                    </SelectItem>
-                  ))}
+                    </SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -239,39 +238,22 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
             <div className="space-y-2">
               <Label>Cliente</Label>
               <div className="flex gap-2">
-                <Input
-                  className="flex-1"
-                  placeholder="Buscar cliente por nome ou telefone"
-                  value={clientSearch}
-                  onChange={(e) => setClientSearch(e.target.value)}
-                />
-                <Button 
-                  variant="outline" 
-                  size="icon"
-                  onClick={() => setShowNewClientModal(true)}
-                >
+                <Input className="flex-1" placeholder="Buscar cliente por nome ou telefone" value={clientSearch} onChange={e => setClientSearch(e.target.value)} />
+                <Button variant="outline" size="icon" onClick={() => setShowNewClientModal(true)}>
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
 
               {/* Lista de clientes filtrados */}
-              {clientSearch && (
-                <div className="border rounded-md max-h-32 overflow-y-auto">
-                  {filteredClients.map(client => (
-                    <div
-                      key={client.id}
-                      className={`p-2 cursor-pointer hover:bg-muted ${selectedClient === client.id.toString() ? 'bg-primary/10' : ''}`}
-                      onClick={() => {
-                        setSelectedClient(client.id.toString());
-                        setClientSearch(client.name);
-                      }}
-                    >
+              {clientSearch && <div className="border rounded-md max-h-32 overflow-y-auto">
+                  {filteredClients.map(client => <div key={client.id} className={`p-2 cursor-pointer hover:bg-muted ${selectedClient === client.id.toString() ? 'bg-primary/10' : ''}`} onClick={() => {
+                setSelectedClient(client.id.toString());
+                setClientSearch(client.name);
+              }}>
                       <div className="font-medium">{client.name}</div>
                       <div className="text-sm text-muted-foreground">{client.phone}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    </div>)}
+                </div>}
             </div>
           </div>
 
@@ -284,11 +266,9 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
                   <SelectValue placeholder="Selecione um serviço" />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockServices.map(service => (
-                    <SelectItem key={service.id} value={service.id.toString()}>
+                  {mockServices.map(service => <SelectItem key={service.id} value={service.id.toString()}>
                       {service.name} - {service.duration_minutes}min - R$ {service.price}
-                    </SelectItem>
-                  ))}
+                    </SelectItem>)}
                 </SelectContent>
               </Select>
               <Button variant="outline" size="icon">
@@ -297,19 +277,12 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
             </div>
 
             {/* Serviços Selecionados */}
-            {selectedServices.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {selectedServices.map(service => (
-                  <Badge key={service.id} variant="secondary" className="flex items-center gap-2">
+            {selectedServices.length > 0 && <div className="flex flex-wrap gap-2 mt-2">
+                {selectedServices.map(service => <Badge key={service.id} variant="secondary" className="flex items-center gap-2">
                     {service.name} ({service.duration_minutes}min)
-                    <X 
-                      className="h-3 w-3 cursor-pointer" 
-                      onClick={() => removeService(service.id)}
-                    />
-                  </Badge>
-                ))}
-              </div>
-            )}
+                    <X className="h-3 w-3 cursor-pointer" onClick={() => removeService(service.id)} />
+                  </Badge>)}
+              </div>}
           </div>
 
 
@@ -317,30 +290,16 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
             {/* Duração */}
             <div className="space-y-2">
               <Label htmlFor="duration">Duração (minutos)</Label>
-              <Input
-                id="duration"
-                type="number"
-                min="1"
-                value={totalDuration || ""}
-                onChange={(e) => setCustomDuration(parseInt(e.target.value) || 0)}
-                placeholder="Duração em minutos"
-              />
-              {totalServiceDuration > 0 && totalDuration !== totalServiceDuration && (
-                <p className="text-xs text-muted-foreground">
+              <Input id="duration" type="number" min="1" value={totalDuration || ""} onChange={e => setCustomDuration(parseInt(e.target.value) || 0)} placeholder="Duração em minutos" />
+              {totalServiceDuration > 0 && totalDuration !== totalServiceDuration && <p className="text-xs text-muted-foreground">
                   Duração sugerida: {totalServiceDuration}min
-                </p>
-              )}
+                </p>}
             </div>
 
             {/* Observações */}
             <div className="space-y-2">
               <Label htmlFor="observations">Observações</Label>
-              <Textarea
-                id="observations"
-                placeholder="Notas adicionais sobre o agendamento..."
-                value={observations}
-                onChange={(e) => setObservations(e.target.value)}
-              />
+              <Textarea id="observations" placeholder="Notas adicionais sobre o agendamento..." value={observations} onChange={e => setObservations(e.target.value)} />
             </div>
           </div>
 
@@ -372,8 +331,6 @@ const NewAppointmentModal = ({ isOpen, onClose, prefilledData, editingAppointmen
           </div>
         </DialogContent>
       </Dialog>
-    </>
-  );
+    </>;
 };
-
 export default NewAppointmentModal;
