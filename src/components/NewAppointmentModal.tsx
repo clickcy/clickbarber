@@ -197,7 +197,7 @@ const NewAppointmentModal = ({
                 <Button variant="outline" size="sm" className="bg-green-500 hover:bg-green-600 text-white border-green-500">
                   Comanda
                 </Button>
-                <Button variant="outline" size="sm" className="bg-blue-500 hover:bg-blue-600 text-white border-blue-500">
+                <Button variant="outline" size="sm" className="text-white border-blue-500 bg-orange-800 hover:bg-orange-700">
                   Produto
                 </Button>
               </div>
