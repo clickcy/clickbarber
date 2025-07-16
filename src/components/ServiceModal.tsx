@@ -46,7 +46,6 @@ const mockProfessionals: Professional[] = [
 
 export const ServiceModal = ({ isOpen, onClose, onAddItem }: ServiceModalProps) => {
   const [selectedService, setSelectedService] = useState<string>("");
-  const [selectedProfessional, setSelectedProfessional] = useState<string>("");
   const [date, setDate] = useState<string>("");
   const [time, setTime] = useState<string>("");
 
@@ -58,20 +57,14 @@ export const ServiceModal = ({ isOpen, onClose, onAddItem }: ServiceModalProps) 
       return;
     }
 
-    if (!selectedProfessional) {
-      alert("Selecione um profissional");
-      return;
-    }
-
     if (!date || !time) {
       alert("Defina data e hora");
       return;
     }
 
     const service = mockServices.find(s => s.id.toString() === selectedService);
-    const professional = mockProfessionals.find(p => p.id.toString() === selectedProfessional);
 
-    if (!service || !professional) return;
+    if (!service) return;
 
     const datetime = new Date(`${date}T${time}`);
 
@@ -80,13 +73,11 @@ export const ServiceModal = ({ isOpen, onClose, onAddItem }: ServiceModalProps) 
       name: service.name,
       price: service.price,
       quantity: 1, // Services are always quantity 1
-      professional,
       datetime
     });
 
     // Reset form
     setSelectedService("");
-    setSelectedProfessional("");
     setDate("");
     setTime("");
     
@@ -117,21 +108,6 @@ export const ServiceModal = ({ isOpen, onClose, onAddItem }: ServiceModalProps) 
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label>Profissional</Label>
-            <Select value={selectedProfessional} onValueChange={setSelectedProfessional}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione um profissional" />
-              </SelectTrigger>
-              <SelectContent>
-                {mockProfessionals.map(prof => (
-                  <SelectItem key={prof.id} value={prof.id.toString()}>
-                    {prof.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">

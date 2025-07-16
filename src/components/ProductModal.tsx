@@ -48,7 +48,6 @@ export const ProductModal = ({ isOpen, onClose, onAddItem }: ProductModalProps) 
   const [selectedProduct, setSelectedProduct] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
   const [commission, setCommission] = useState<number>(0);
-  const [selectedProfessional, setSelectedProfessional] = useState<string>("");
 
   const selectedProductData = mockProducts.find(p => p.id.toString() === selectedProduct);
 
@@ -64,7 +63,6 @@ export const ProductModal = ({ isOpen, onClose, onAddItem }: ProductModalProps) 
     }
 
     const product = mockProducts.find(p => p.id.toString() === selectedProduct);
-    const professional = mockProfessionals.find(p => p.id.toString() === selectedProfessional);
 
     if (!product) return;
 
@@ -73,7 +71,6 @@ export const ProductModal = ({ isOpen, onClose, onAddItem }: ProductModalProps) 
       name: product.name,
       price: product.price,
       quantity,
-      professional,
       commission: commission > 0 ? commission : undefined
     });
 
@@ -81,7 +78,6 @@ export const ProductModal = ({ isOpen, onClose, onAddItem }: ProductModalProps) 
     setSelectedProduct("");
     setQuantity(1);
     setCommission(0);
-    setSelectedProfessional("");
     
     onClose();
   };
@@ -133,21 +129,6 @@ export const ProductModal = ({ isOpen, onClose, onAddItem }: ProductModalProps) 
             />
           </div>
 
-          <div className="space-y-2">
-            <Label>Profissional</Label>
-            <Select value={selectedProfessional} onValueChange={setSelectedProfessional}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione um profissional" />
-              </SelectTrigger>
-              <SelectContent>
-                {mockProfessionals.map(prof => (
-                  <SelectItem key={prof.id} value={prof.id.toString()}>
-                    {prof.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
 
           {selectedProductData && (
             <div className="p-3 bg-muted rounded-lg">
