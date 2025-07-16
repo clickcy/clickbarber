@@ -469,10 +469,15 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
                 </div>
               </div>
 
-              {/* Botão Finalizar */}
-              <Button onClick={handleSubmit} className="w-full" size="lg">
-                Finalizar Comanda
-              </Button>
+              {/* Botões de Ação */}
+              <div className="space-y-2">
+                <Button className="w-full bg-green-600 hover:bg-green-700 text-white" size="lg">
+                  Salvar Comanda
+                </Button>
+                <Button onClick={handleSubmit} className="w-full" size="lg">
+                  Finalizar Comanda
+                </Button>
+              </div>
             </div>
           </div>
         </DialogContent>
