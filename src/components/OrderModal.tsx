@@ -353,18 +353,6 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
                     step="0.01"
                     className="text-sm"
                   />
-                  <Select value={tipProfessional} onValueChange={setTipProfessional}>
-                    <SelectTrigger className="text-sm">
-                      <SelectValue placeholder="Profissional" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {mockProfessionals.map(prof => (
-                        <SelectItem key={prof.id} value={prof.id.toString()}>
-                          {prof.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
                 </div>
               </div>
 
