@@ -164,26 +164,26 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
+        <DialogContent className="max-w-6xl max-h-[95vh] overflow-hidden">
+          <DialogHeader className="pb-2">
             <DialogTitle className="text-xl font-bold">Nova Comanda</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-6">
-            {/* Cliente/Profissional Selection */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Cliente/Profissional</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex gap-4">
+          <div className="grid grid-cols-3 gap-4 h-[calc(95vh-120px)]">
+            {/* Coluna 1: Cliente e Itens */}
+            <div className="space-y-3">
+              {/* Cliente/Profissional Selection - Compacto */}
+              <div className="border rounded-lg p-3">
+                <div className="flex gap-2 mb-2">
                   <Button 
+                    size="sm"
                     variant={clientType === 'client' ? 'default' : 'outline'}
                     onClick={() => setClientType('client')}
                   >
                     Cliente
                   </Button>
                   <Button 
+                    size="sm"
                     variant={clientType === 'professional' ? 'default' : 'outline'}
                     onClick={() => setClientType('professional')}
                   >
@@ -192,38 +192,40 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
                 </div>
 
                 {clientType === 'client' ? (
-                  <div className="space-y-4">
+                  <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <input 
                         type="checkbox" 
                         id="walkIn" 
                         checked={walkInClient}
                         onChange={(e) => setWalkInClient(e.target.checked)}
+                        className="w-4 h-4"
                       />
-                      <Label htmlFor="walkIn">Cliente sem cadastro</Label>
+                      <Label htmlFor="walkIn" className="text-sm">Sem cadastro</Label>
                     </div>
                     
                     {!walkInClient && (
                       <>
                         <Input
-                          placeholder="Buscar cliente por nome ou telefone"
+                          placeholder="Buscar cliente"
                           value={clientSearch}
                           onChange={(e) => setClientSearch(e.target.value)}
+                          className="text-sm"
                         />
                         
                         {clientSearch && (
-                          <div className="border rounded-md max-h-32 overflow-y-auto">
+                          <div className="border rounded-md max-h-24 overflow-y-auto">
                             {filteredClients.map(client => (
                               <div 
                                 key={client.id}
-                                className={`p-2 cursor-pointer hover:bg-muted ${selectedClient === client.id.toString() ? 'bg-primary/10' : ''}`}
+                                className={`p-2 cursor-pointer hover:bg-muted text-sm ${selectedClient === client.id.toString() ? 'bg-primary/10' : ''}`}
                                 onClick={() => {
                                   setSelectedClient(client.id.toString());
                                   setClientSearch(client.name);
                                 }}
                               >
                                 <div className="font-medium">{client.name}</div>
-                                <div className="text-sm text-muted-foreground">{client.phone}</div>
+                                <div className="text-xs text-muted-foreground">{client.phone}</div>
                               </div>
                             ))}
                           </div>
@@ -233,128 +235,7 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
                   </div>
                 ) : (
                   <Select value={selectedProfessional} onValueChange={setSelectedProfessional}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione um profissional" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {mockProfessionals.map(prof => (
-                        <SelectItem key={prof.id} value={prof.id.toString()}>
-                          {prof.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Action Buttons */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Itens da Comanda</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-4 mb-4">
-                  <Button 
-                    onClick={() => setProductModalOpen(true)}
-                    className="flex items-center gap-2"
-                    variant="outline"
-                  >
-                    <ShoppingCart className="h-4 w-4" />
-                    Produto
-                  </Button>
-                  <Button 
-                    onClick={() => setServiceModalOpen(true)}
-                    className="flex items-center gap-2"
-                    variant="outline"
-                  >
-                    <Scissors className="h-4 w-4" />
-                    Serviço
-                  </Button>
-                </div>
-
-                {/* Order Items List */}
-                <div className="space-y-2">
-                  {orderItems.map(item => (
-                    <div key={item.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <Badge variant={item.type === 'product' ? 'default' : 'secondary'}>
-                            {item.type === 'product' ? 'Produto' : 'Serviço'}
-                          </Badge>
-                          <span className="font-medium">{item.name}</span>
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          Qtd: {item.quantity} x R$ {item.price.toFixed(2)} = R$ {(item.price * item.quantity).toFixed(2)}
-                          {item.professional && ` | ${item.professional.name}`}
-                          {item.commission && ` | Comissão: ${item.commission}%`}
-                        </div>
-                      </div>
-                      <Button 
-                        size="sm" 
-                        variant="destructive" 
-                        onClick={() => handleRemoveItem(item.id)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                  {orderItems.length === 0 && (
-                    <p className="text-muted-foreground text-center py-4">
-                      Nenhum item adicionado à comanda
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Discount and Tip */}
-            <div className="grid grid-cols-2 gap-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Percent className="h-4 w-4" />
-                    Desconto
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex gap-2">
-                    <Input
-                      type="number"
-                      placeholder="Porcentagem"
-                      value={discountPercent || ""}
-                      onChange={(e) => setDiscountPercent(Number(e.target.value))}
-                      min="0"
-                      max="100"
-                    />
-                    <Button onClick={applyDiscount}>Aplicar</Button>
-                  </div>
-                  {discountAmount > 0 && (
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Desconto: R$ {discountAmount.toFixed(2)}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <DollarSign className="h-4 w-4" />
-                    Gorjeta
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Input
-                    type="number"
-                    placeholder="Valor da gorjeta"
-                    value={tipAmount || ""}
-                    onChange={(e) => setTipAmount(Number(e.target.value))}
-                    min="0"
-                    step="0.01"
-                  />
-                  <Select value={tipProfessional} onValueChange={setTipProfessional}>
-                    <SelectTrigger>
+                    <SelectTrigger className="text-sm">
                       <SelectValue placeholder="Selecionar profissional" />
                     </SelectTrigger>
                     <SelectContent>
@@ -365,34 +246,173 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
                       ))}
                     </SelectContent>
                   </Select>
-                </CardContent>
-              </Card>
+                )}
+              </div>
+
+              {/* Botões de Ação */}
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => setProductModalOpen(true)}
+                  className="flex-1 text-sm"
+                  variant="outline"
+                  size="sm"
+                >
+                  <ShoppingCart className="h-3 w-3 mr-1" />
+                  Produto
+                </Button>
+                <Button 
+                  onClick={() => setServiceModalOpen(true)}
+                  className="flex-1 text-sm"
+                  variant="outline"
+                  size="sm"
+                >
+                  <Scissors className="h-3 w-3 mr-1" />
+                  Serviço
+                </Button>
+              </div>
+
+              {/* Lista de Itens - Scrollável */}
+              <div className="border rounded-lg p-3 flex-1 overflow-hidden">
+                <h4 className="font-medium text-sm mb-2">Itens da Comanda</h4>
+                <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                  {orderItems.map(item => (
+                    <div key={item.id} className="flex items-start justify-between p-2 border rounded text-xs">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1">
+                          <Badge variant={item.type === 'product' ? 'default' : 'secondary'} className="text-xs px-1 py-0">
+                            {item.type === 'product' ? 'P' : 'S'}
+                          </Badge>
+                          <span className="font-medium truncate">{item.name}</span>
+                        </div>
+                        <div className="text-muted-foreground">
+                          {item.quantity}x R$ {item.price.toFixed(2)} = R$ {(item.price * item.quantity).toFixed(2)}
+                        </div>
+                        {item.professional && (
+                          <div className="text-muted-foreground">{item.professional.name}</div>
+                        )}
+                      </div>
+                      <Button 
+                        size="sm" 
+                        variant="destructive" 
+                        onClick={() => handleRemoveItem(item.id)}
+                        className="h-6 w-6 p-0 ml-1"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                  {orderItems.length === 0 && (
+                    <p className="text-muted-foreground text-center py-4 text-sm">
+                      Nenhum item adicionado
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
 
-            {/* Payment and Total */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Pagamento</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label>Método de Pagamento</Label>
-                  <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o método de pagamento" />
+            {/* Coluna 2: Desconto, Gorjeta e Pagamento */}
+            <div className="space-y-3">
+              {/* Desconto */}
+              <div className="border rounded-lg p-3">
+                <h4 className="font-medium text-sm mb-2 flex items-center gap-1">
+                  <Percent className="h-3 w-3" />
+                  Desconto
+                </h4>
+                <div className="flex gap-2">
+                  <Input
+                    type="number"
+                    placeholder="%"
+                    value={discountPercent || ""}
+                    onChange={(e) => setDiscountPercent(Number(e.target.value))}
+                    min="0"
+                    max="100"
+                    className="text-sm"
+                  />
+                  <Button onClick={applyDiscount} size="sm">Aplicar</Button>
+                </div>
+                {discountAmount > 0 && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Desconto: R$ {discountAmount.toFixed(2)}
+                  </p>
+                )}
+              </div>
+
+              {/* Gorjeta */}
+              <div className="border rounded-lg p-3">
+                <h4 className="font-medium text-sm mb-2 flex items-center gap-1">
+                  <DollarSign className="h-3 w-3" />
+                  Gorjeta
+                </h4>
+                <div className="space-y-2">
+                  <Input
+                    type="number"
+                    placeholder="Valor da gorjeta"
+                    value={tipAmount || ""}
+                    onChange={(e) => setTipAmount(Number(e.target.value))}
+                    min="0"
+                    step="0.01"
+                    className="text-sm"
+                  />
+                  <Select value={tipProfessional} onValueChange={setTipProfessional}>
+                    <SelectTrigger className="text-sm">
+                      <SelectValue placeholder="Profissional" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="credit">Crédito</SelectItem>
-                      <SelectItem value="debit">Débito</SelectItem>
-                      <SelectItem value="pix">PIX</SelectItem>
-                      <SelectItem value="cash">Dinheiro</SelectItem>
+                      {mockProfessionals.map(prof => (
+                        <SelectItem key={prof.id} value={prof.id.toString()}>
+                          {prof.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
 
-                <Separator />
+              {/* Método de Pagamento */}
+              <div className="border rounded-lg p-3">
+                <h4 className="font-medium text-sm mb-2">Pagamento</h4>
+                <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                  <SelectTrigger className="text-sm">
+                    <SelectValue placeholder="Método de pagamento" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="credit">Crédito</SelectItem>
+                    <SelectItem value="debit">Débito</SelectItem>
+                    <SelectItem value="pix">PIX</SelectItem>
+                    <SelectItem value="cash">Dinheiro</SelectItem>
+                  </SelectContent>
+                </Select>
 
-                <div className="space-y-2">
+                {paymentMethod === 'cash' && (
+                  <div className="space-y-2 mt-2">
+                    <Input
+                      type="number"
+                      placeholder="Valor recebido"
+                      value={receivedAmount || ""}
+                      onChange={(e) => setReceivedAmount(Number(e.target.value))}
+                      min="0"
+                      step="0.01"
+                      className="text-sm"
+                    />
+                    {receivedAmount > 0 && (
+                      <div className="flex justify-between text-sm font-medium">
+                        <span>Troco:</span>
+                        <span className={change >= 0 ? 'text-green-600' : 'text-red-600'}>
+                          R$ {change.toFixed(2)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Coluna 3: Totais e Finalizar */}
+            <div className="space-y-3">
+              {/* Resumo dos Totais */}
+              <div className="border rounded-lg p-3">
+                <h4 className="font-medium text-sm mb-3">Resumo</h4>
+                <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Subtotal:</span>
                     <span>R$ {subtotal.toFixed(2)}</span>
@@ -415,35 +435,45 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
                     <span>R$ {totalWithTip.toFixed(2)}</span>
                   </div>
                 </div>
+              </div>
 
-                {paymentMethod === 'cash' && (
-                  <div className="space-y-2">
-                    <Label>Valor Recebido</Label>
-                    <Input
-                      type="number"
-                      placeholder="Valor recebido"
-                      value={receivedAmount || ""}
-                      onChange={(e) => setReceivedAmount(Number(e.target.value))}
-                      min="0"
-                      step="0.01"
-                    />
-                    {receivedAmount > 0 && (
-                      <div className="flex justify-between font-medium">
-                        <span>Troco:</span>
-                        <span className={change >= 0 ? 'text-green-600' : 'text-red-600'}>
-                          R$ {change.toFixed(2)}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+              {/* Resumo do Cliente/Profissional */}
+              <div className="border rounded-lg p-3">
+                <h4 className="font-medium text-sm mb-2">Cliente/Profissional</h4>
+                <div className="text-sm text-muted-foreground">
+                  {clientType === 'client' ? (
+                    walkInClient ? (
+                      "Cliente sem cadastro"
+                    ) : selectedClient ? (
+                      mockClients.find(c => c.id.toString() === selectedClient)?.name || "Cliente selecionado"
+                    ) : (
+                      "Nenhum cliente selecionado"
+                    )
+                  ) : (
+                    selectedProfessional ? (
+                      mockProfessionals.find(p => p.id.toString() === selectedProfessional)?.name || "Profissional selecionado"
+                    ) : (
+                      "Nenhum profissional selecionado"
+                    )
+                  )}
+                </div>
+              </div>
 
-            {/* Submit Button */}
-            <Button onClick={handleSubmit} className="w-full" size="lg">
-              Finalizar Comanda
-            </Button>
+              {/* Resumo dos Itens */}
+              <div className="border rounded-lg p-3 flex-1">
+                <h4 className="font-medium text-sm mb-2">Resumo dos Itens</h4>
+                <div className="text-xs text-muted-foreground">
+                  <div>Total de itens: {orderItems.length}</div>
+                  <div>Produtos: {orderItems.filter(i => i.type === 'product').length}</div>
+                  <div>Serviços: {orderItems.filter(i => i.type === 'service').length}</div>
+                </div>
+              </div>
+
+              {/* Botão Finalizar */}
+              <Button onClick={handleSubmit} className="w-full" size="lg">
+                Finalizar Comanda
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
