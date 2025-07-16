@@ -194,7 +194,16 @@ const NewAppointmentModal = ({
             <div className="flex items-center justify-between px-[15px]">
               <DialogTitle>{editingAppointment ? 'Editar Agendamento' : 'Agendar novo horário'}</DialogTitle>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="bg-green-500 hover:bg-green-600 text-white border-green-500">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="bg-green-500 hover:bg-green-600 text-white border-green-500"
+                  onClick={() => {
+                    onClose();
+                    // This will need to be handled by the parent component
+                    console.log("Opening order modal from appointment modal");
+                  }}
+                >
                   Comanda
                 </Button>
                 <Button variant="outline" size="sm" className="text-white border-blue-500 bg-orange-800 hover:bg-orange-700">

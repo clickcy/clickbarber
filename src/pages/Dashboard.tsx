@@ -3,14 +3,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Calendar, Clock, Users, DollarSign, TrendingUp, Plus, X } from "lucide-react";
+import { Calendar, Clock, Users, DollarSign, TrendingUp, Plus, X, Receipt } from "lucide-react";
 import NewAppointmentModal from "@/components/NewAppointmentModal";
+import OrderModal from "@/components/OrderModal";
 import { DateNavigation } from "@/components/DateNavigation";
 import { AppointmentTooltip } from "@/components/AppointmentTooltip";
 import { CurrentTimeIndicator } from "@/components/CurrentTimeIndicator";
 const Dashboard = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isNewAppointmentModalOpen, setIsNewAppointmentModalOpen] = useState(false);
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [prefilledAppointmentData, setPrefilledAppointmentData] = useState<{
     date: Date;
     time: string;
@@ -247,10 +249,19 @@ const Dashboard = () => {
                 </p>
                 <DateNavigation selectedDate={selectedDate} onDateChange={setSelectedDate} />
               </div>
-              <Button className="gradient-bg hover:opacity-90" onClick={handleNewAppointmentFromButton}>
-                <Plus className="h-4 w-4 mr-2" />
-                Novo Agendamento
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  className="bg-green-600 hover:bg-green-700 text-white" 
+                  onClick={() => setIsOrderModalOpen(true)}
+                >
+                  <Receipt className="h-4 w-4 mr-2" />
+                  Comanda
+                </Button>
+                <Button className="gradient-bg hover:opacity-90" onClick={handleNewAppointmentFromButton}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Novo Agendamento
+                </Button>
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -353,6 +364,9 @@ const Dashboard = () => {
       setEditingAppointment(undefined);
       setPrefilledAppointmentData(undefined);
     }} prefilledData={prefilledAppointmentData} editingAppointment={editingAppointment} />
+
+      {/* Modal de Comanda */}
+      <OrderModal isOpen={isOrderModalOpen} onClose={() => setIsOrderModalOpen(false)} />
 
       {/* Dialog de Confirmação de Exclusão */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
